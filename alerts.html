@@ -141,34 +141,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>101</td>
-                                            <td>2024-11-14 08:45:00</td>
-                                            <td>4 m</td>
-                                            <td class="status-critical">Critical</td>
-                                            <td>Evacuate immediately</td>
-                                        </tr>
-                                        <tr>
-                                            <td>102</td>
-                                            <td>2024-11-14 07:30:00</td>
-                                            <td>3 m</td>
-                                            <td class="status-high">High</td>
-                                            <td>Prepare for possible evacuation</td>
-                                        </tr>
-                                        <tr>
-                                            <td>103</td>
-                                            <td>2024-11-14 06:15:00</td>
-                                            <td>2 m</td>
-                                            <td class="status-moderate">Moderate</td>
-                                            <td>Monitor closely</td>
-                                        </tr>
-                                        <tr>
-                                            <td>104</td>
-                                            <td>2024-11-14 05:00:00</td>
-                                            <td>1 m</td>
-                                            <td class="status-moderate">Moderate</td>
-                                            <td>Monitor closely</td>
-                                        </tr>
+                                        <!-- Data will be fetched and displayed here -->
                                     </tbody>
                                 </table>
                             </div>
@@ -211,6 +184,7 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <!-- jQuery (required by AdminLTE) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
@@ -221,33 +195,62 @@
     });
 </script>
 <script>
-    function fetchAlerts() {
-        fetch('get_alerts.php') // Replace with your backend endpoint
-            .then(response => response.json())
-            .then(data => {
-                const tableBody = document.querySelector('table tbody');
-                tableBody.innerHTML = ''; // Clear existing rows
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-                data.forEach(alert => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${alert.alert_id}</td>
-                        <td>${alert.last_updated}</td>
-                        <td>${alert.water_level} m</td>
-                        <td class="status-${alert.status.toLowerCase()}">${alert.status}</td>
-                        <td>${alert.action_required}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching alerts:', error));
+    async function fetchAlerts() {
+    try {
+        // Fetch data from Supabase table
+        const { data, error } = await supabase
+            .from('water_levels')
+            .select('id, water_level, last_updated');
+
+        if (error) {
+            console.error('Error fetching data:', error);
+            return;
+        }
+
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        data.forEach(alert => {
+            // Determine status and action based on water level
+            let status, actionRequired;
+            if (alert.water_level >= 3) {
+                status = 'Critical';
+                actionRequired = 'Evacuate immediately';
+            } else if (alert.water_level >= 2) {
+                status = 'High';
+                actionRequired = 'Prepare for possible evacuation';
+            } else {
+                status = 'Moderate';
+                actionRequired = 'Monitor closely';
+            }
+
+            // Create table row
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${alert.id}</td>
+                <td>${new Date(alert.last_updated).toLocaleString()}</td>
+                <td>${alert.water_level} m</td>
+                <td class="status-${status.toLowerCase()}">${status}</td>
+                <td>${actionRequired}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error('Unexpected error:', err);
     }
+}
 
-    // Fetch alerts immediately when the page loads
-    document.addEventListener("DOMContentLoaded", fetchAlerts);
+// Fetch and display alerts on page load
+document.addEventListener('DOMContentLoaded', fetchAlerts);
 
     // Optionally, refresh alerts every 5 seconds
-    setInterval(fetchAlerts, 5000);
+    setInterval(fetchAlerts, 10000);
 </script>
+
 </body>
 </html>
