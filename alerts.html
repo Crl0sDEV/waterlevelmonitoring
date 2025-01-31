@@ -199,57 +199,52 @@
 
     const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function fetchAlerts() {
-    try {
-        // Fetch data from Supabase table
-        const { data, error } = await supabase
-            .from('water_levels')
-            .select('id, water_level, last_updated');
+        try {
+            const { data, error } = await supabase
+                .from('water_levels')
+                .select('id, water_level, last_updated');
 
-        if (error) {
-            console.error('Error fetching data:', error);
-            return;
-        }
-
-        const tableBody = document.querySelector('table tbody');
-        tableBody.innerHTML = ''; // Clear existing rows
-
-        data.forEach(alert => {
-            // Determine status and action based on water level
-            let status, actionRequired;
-            if (alert.water_level >= 3) {
-                status = 'Critical';
-                actionRequired = 'Evacuate immediately';
-            } else if (alert.water_level >= 2) {
-                status = 'High';
-                actionRequired = 'Prepare for possible evacuation';
-            } else {
-                status = 'Moderate';
-                actionRequired = 'Monitor closely';
+            if (error) {
+                console.error('Error fetching data:', error);
+                return;
             }
 
-            // Create table row
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${alert.id}</td>
-                <td>${new Date(alert.last_updated).toLocaleString()}</td>
-                <td>${alert.water_level} m</td>
-                <td class="status-${status.toLowerCase()}">${status}</td>
-                <td>${actionRequired}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    } catch (err) {
-        console.error('Unexpected error:', err);
+            const tableBody = document.querySelector('table tbody');
+            tableBody.innerHTML = '';
+
+            data.forEach(alert => {
+                let status, actionRequired;
+                if (alert.water_level >= 3) {
+                    status = 'Critical';
+                    actionRequired = 'Evacuate immediately';
+                } else if (alert.water_level >= 2) {
+                    status = 'High';
+                    actionRequired = 'Prepare for possible evacuation';
+                } else {
+                    status = 'Moderate';
+                    actionRequired = 'Monitor closely';
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alert.id}</td>
+                    <td>${new Date(alert.last_updated).toLocaleString()}</td>
+                    <td>${alert.water_level} m</td>
+                    <td class="status-${status.toLowerCase()}">${status}</td>
+                    <td>${actionRequired}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (err) {
+            console.error('Unexpected error:', err);
+        }
     }
-}
 
-// Fetch and display alerts on page load
-document.addEventListener('DOMContentLoaded', fetchAlerts);
+    document.addEventListener('DOMContentLoaded', fetchAlerts);
 
-    // Optionally, refresh alerts every 5 seconds
     setInterval(fetchAlerts, 10000);
 </script>
 
