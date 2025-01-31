@@ -202,46 +202,47 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function fetchAlerts() {
-        try {
-            const { data, error } = await supabase
-                .from('water_levels')
-                .select('id, water_level, last_updated');
+    try {
+        const { data, error } = await supabase
+            .from('water_levels')
+            .select('id, water_level, last_updated')
+            .order('last_updated', { ascending: false }); // Order by last_updated in descending order
 
-            if (error) {
-                console.error('Error fetching data:', error);
-                return;
+        if (error) {
+            console.error('Error fetching data:', error);
+            return;
+        }
+
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = '';
+
+        data.forEach(alert => {
+            let status, actionRequired;
+            if (alert.water_level >= 3) {
+                status = 'Critical';
+                actionRequired = 'Evacuate immediately';
+            } else if (alert.water_level >= 2) {
+                status = 'High';
+                actionRequired = 'Prepare for possible evacuation';
+            } else {
+                status = 'Moderate';
+                actionRequired = 'Monitor closely';
             }
 
-            const tableBody = document.querySelector('table tbody');
-            tableBody.innerHTML = '';
-
-            data.forEach(alert => {
-                let status, actionRequired;
-                if (alert.water_level >= 3) {
-                    status = 'Critical';
-                    actionRequired = 'Evacuate immediately';
-                } else if (alert.water_level >= 2) {
-                    status = 'High';
-                    actionRequired = 'Prepare for possible evacuation';
-                } else {
-                    status = 'Moderate';
-                    actionRequired = 'Monitor closely';
-                }
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${alert.id}</td>
-                    <td>${new Date(alert.last_updated).toLocaleString()}</td>
-                    <td>${alert.water_level} m</td>
-                    <td class="status-${status.toLowerCase()}">${status}</td>
-                    <td>${actionRequired}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        } catch (err) {
-            console.error('Unexpected error:', err);
-        }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${alert.id}</td>
+                <td>${new Date(alert.last_updated).toLocaleString()}</td>
+                <td>${alert.water_level} m</td>
+                <td class="status-${status.toLowerCase()}">${status}</td>
+                <td>${actionRequired}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error('Unexpected error:', err);
     }
+}
 
     document.addEventListener('DOMContentLoaded', fetchAlerts);
 
