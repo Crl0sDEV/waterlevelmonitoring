@@ -1,0 +1,62 @@
+.content-wrapper {
+    margin: 0;
+    padding: 0;
+    background: #C9E6F0;
+    overflow: hidden;
+}
+
+
+.color-legend-container {
+    max-width: 800px; /* Adjust the size of the legend box */
+    margin: 20px auto; /* Center the container */
+    text-align: center; /* Align text in the center */
+    background-color: #f8f9fa; /* Light gray background for the legend container */
+    padding: 15px; /* Space inside the box */
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.color-legend-title {
+    font-weight: bold;
+    font-size: 14px; /* Smaller title text */
+    margin-bottom: 10px; /* Space between title and legend items */
+    text-align: left;
+}
+
+.color-legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Two columns */
+    gap: 10px; /* Space between items */
+}
+
+.color-legend-item {
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    padding: 5px; /* Reduce padding for smaller size */
+    border-radius: 5px;
+    background-color: white; /* Background for individual items */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Shadow for each item */
+}
+
+.color-box {
+    width: 15px; /* Smaller size */
+    height: 15px;
+    margin-right: 10px;
+    border-radius: 3px;
+}
+
+.color-box.critical {
+    background-color: red;
+}
+
+.color-box.high {
+    background-color: orange;
+}
+
+.color-box.moderate {
+    background-color: gold;
+}
+
+
+
