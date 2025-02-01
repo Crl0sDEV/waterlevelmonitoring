@@ -357,126 +357,124 @@
       });
     </script>
     <script type="module">
-      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-      const SUPABASE_URL = "https://efirubankmowqztlyuuh.supabase.co"; // Replace with your Supabase URL
-      const SUPABASE_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog"; // Replace with your Supabase API key
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = "https://efirubankmowqztlyuuh.supabase.co"; // Replace with your Supabase URL
+        const SUPABASE_KEY =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog"; // Replace with your Supabase API key
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // Request notification permission
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            console.log("Notification permission granted.");
-          }
-        });
-      }
-
-      // Flag to track if the notification has been shown
-      let notificationShown = false;
-
-      // Show toast notification
-      function showToast() {
-        const toastElement = document.getElementById("waterLevelToast");
-        const toast = new bootstrap.Toast(toastElement, {
-          autohide: true,
-          delay: 5000,
-        });
-
-        const audio = document.getElementById("toastSound");
-        audio.play().catch((error) => {
-          console.error("Audio playback blocked or failed:", error);
-        });
-
-        toast.show();
-      }
-
-      // Show browser notification
-      function showNotification(title, message) {
-        if (Notification.permission === "granted") {
-          new Notification(title, {
-            body: message,
-            icon: "image/water-level-3-48.png", // Optional: Add an icon for the notification
+        // Request notification permission
+        if (Notification.permission !== "granted") {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              console.log("Notification permission granted.");
+            }
           });
         }
-      }
 
-      // Fetch latest water level from Supabase
-      async function fetchLatestWaterLevel() {
-        try {
-          const { data, error } = await supabase
-            .from("water_levels") // Replace with your table name
-            .select("*")
-            .order("last_updated", { ascending: false }) // Replace 'timestamp' with your timestamp column
-            .limit(1);
+        // Show toast notification
+        function showToast() {
+          const toastElement = document.getElementById("waterLevelToast");
+          const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 5000,
+          });
 
-          if (error) {
-            console.error("Error fetching data:", error);
-            return;
-          }
+          const audio = document.getElementById("toastSound");
+          audio.play().catch((error) => {
+            console.error("Audio playback blocked or failed:", error);
+          });
 
-          if (data && data.length > 0) {
-            const latestWaterLevel = data[0].water_level; // Replace 'level' with your column name for water level
-            document.querySelector(".small-box.bg-info .inner h3").textContent =
-              latestWaterLevel;
-
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-              if (!notificationShown) {
-                showToast();
-                showNotification(
-                  "Water Level Alert",
-                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
-                );
-                notificationShown = true; // Set the flag to true to prevent duplicate notifications
-              }
-            } else {
-              // Reset the flag if the water level drops below 3m
-              notificationShown = false;
-            }
-          }
-        } catch (err) {
-          console.error("Error:", err);
+          toast.show();
         }
-      }
 
-      // Fetch water level every 30 seconds
-      fetchLatestWaterLevel();
-      setInterval(fetchLatestWaterLevel, 30000);
-
-      // Subscribe to water level changes using Supabase Realtime
-      const channel = supabase
-        .channel("water-level-updates")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT", // Listen for new inserts
-            schema: "public",
-            table: "water_levels", // Replace with your table name
-          },
-          (payload) => {
-            const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            console.log("New water level:", latestWaterLevel);
-
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-              if (!notificationShown) {
-                showToast();
-                showNotification(
-                  "Water Level Alert",
-                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
-                );
-                notificationShown = true; // Set the flag to true to prevent duplicate notifications
-              }
-            } else {
-              // Reset the flag if the water level drops below 3m
-              notificationShown = false;
-            }
+        // Show browser notification
+        function showNotification(title, message) {
+          if (Notification.permission === "granted") {
+            new Notification(title, {
+              body: message,
+              icon: "image/water-level-3-48.png", // Optional: Add an icon for the notification
+            });
           }
-        )
-        .subscribe();
-    </script>
+        }
+
+        // Fetch latest water level from Supabase
+        async function fetchLatestWaterLevel() {
+          try {
+            const { data, error } = await supabase
+              .from("water_levels") // Replace with your table name
+              .select("*")
+              .order("last_updated", { ascending: false }) // Replace 'timestamp' with your timestamp column
+              .limit(1);
+
+            if (error) {
+              console.error("Error fetching data:", error);
+              return;
+            }
+
+            if (data && data.length > 0) {
+              const latestWaterLevel = data[0].water_level; // Replace 'level' with your column name for water level
+              document.querySelector(".small-box.bg-info .inner h3").textContent =
+                latestWaterLevel;
+
+              // Check if water level is 3m or above
+              if (latestWaterLevel >= 3) {
+                if (localStorage.getItem("notificationShown") !== "true") {
+                  showToast();
+                  showNotification(
+                    "Water Level Alert",
+                    `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                  );
+                  localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
+                }
+              } else {
+                // Reset the flag if the water level drops below 3m
+                localStorage.setItem("notificationShown", "false");
+              }
+            }
+          } catch (err) {
+            console.error("Error:", err);
+          }
+        }
+
+        // Fetch water level every 30 seconds
+        fetchLatestWaterLevel();
+        setInterval(fetchLatestWaterLevel, 30000);
+
+        // Subscribe to water level changes using Supabase Realtime
+        const channel = supabase
+          .channel("water-level-updates")
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT", // Listen for new inserts
+              schema: "public",
+              table: "water_levels", // Replace with your table name
+            },
+            (payload) => {
+              const latestWaterLevel = payload.new.water_level; // Replace with your column name
+              console.log("New water level:", latestWaterLevel);
+
+              // Check if water level is 3m or above
+              if (latestWaterLevel >= 3) {
+                if (localStorage.getItem("notificationShown") !== "true") {
+                  showToast();
+                  showNotification(
+                    "Water Level Alert",
+                    `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                  );
+                  localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
+                }
+              } else {
+                // Reset the flag if the water level drops below 3m
+                localStorage.setItem("notificationShown", "false");
+              }
+            }
+          )
+          .subscribe();
+      </script>
+
 
     <script>
       // Register the service worker
