@@ -1,10 +1,10 @@
 {
     "rewrites": [
-      { "source": "/alerts", "destination": "/alerts.html" },
-      { "source": "/dashboard", "destination": "/dashboard.html" },
-      { "source": "/realtime", "destination": "/realtime.html" },
-      { "source": "/history", "destination": "/history.html" },
-      { "source": "/settings", "destination": "/settings.html" }
+      { "source": "/dashboard", "destination": "/dashboard/index.html" },
+      { "source": "/realtime", "destination": "/realtime/index.html" },
+      { "source": "/alerts", "destination": "/alerts/index.html" },
+      { "source": "/history", "destination": "/history/index.html" },
+      { "source": "/settings", "destination": "/settings/index.html" }
     ]
   }
   
