@@ -11,3 +11,12 @@ self.addEventListener('push', (event) => {
         self.registration.showNotification(title, options)
     );
 });
+
+// Handle messages from the application
+self.addEventListener('message', (event) => {
+    const { title, message } = event.data;
+    self.registration.showNotification(title, {
+        body: message,
+        icon: 'image/water-level-3-48.png', // Optional: Add an icon for the notification
+    });
+});

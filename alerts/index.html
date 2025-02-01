@@ -201,6 +201,52 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Request notification permission
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Notification permission granted.");
+            }
+        });
+    }
+
+    // Flag to track if the notification has been shown
+    let notificationShown = false;
+
+    // Show browser notification
+    function showNotification(title, message) {
+        if (Notification.permission === "granted") {
+            new Notification(title, {
+                body: message,
+                icon: "image/water-level-3-48.png" // Optional: Add an icon for the notification
+            });
+        }
+    }
+
+    // Subscribe to water level changes using Supabase Realtime
+    const channel = supabase
+        .channel('water-level-updates')
+        .on('postgres_changes', {
+            event: 'INSERT', // Listen for new inserts
+            schema: 'public',
+            table: 'water_levels', // Replace with your table name
+        }, (payload) => {
+            const latestWaterLevel = payload.new.water_level; // Replace with your column name
+            console.log('New water level:', latestWaterLevel);
+
+            // Check if water level is 3m or above
+            if (latestWaterLevel >= 3) {
+                if (!notificationShown) {
+                    showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
+                    notificationShown = true; // Set the flag to true to prevent duplicate notifications
+                }
+            } else {
+                // Reset the flag if the water level drops below 3m
+                notificationShown = false;
+            }
+        })
+        .subscribe();
+
     async function fetchAlerts() {
     try {
         const { data, error } = await supabase
@@ -247,6 +293,19 @@
     document.addEventListener('DOMContentLoaded', fetchAlerts);
 
     setInterval(fetchAlerts, 10000);
+</script>
+
+<!-- Register the service worker -->
+<script>
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
 </script>
 
 </body>
