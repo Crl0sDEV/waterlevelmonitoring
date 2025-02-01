@@ -227,12 +227,22 @@
         }
     }
 
-    // Function to update the line chart
     function updateChart(labels, data) {
-        lineChart.data.labels = labels;
-        lineChart.data.datasets[0].data = data;
-        lineChart.update();
+    const formattedLabels = labels.map(formatTime);
+    lineChart.data.labels = formattedLabels;
+    lineChart.data.datasets[0].data = data;
+    lineChart.update();
     }
+
+    function formatTime(dateString) {
+    const date = new Date(dateString);
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convert to 12-hour format
+    const minutesFormatted = minutes < 10 ? '0' + minutes : minutes; // Pad minutes
+    return `${hours}:${minutesFormatted} ${ampm}`;
+}
 
     // Subscribe to water level changes using Supabase Realtime
     const channel = supabase
@@ -244,6 +254,7 @@
         }, (payload) => {
             const latestWaterLevel = payload.new.water_level; // Replace with your column name
             const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
+            const formattedTime = formatTime(payload.new.last_updated);
 
             // Update the current water level display
             document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
@@ -254,7 +265,7 @@
             const data = lineChart.data.datasets[0].data;
 
             // Add new data to the chart
-            labels.push(lastUpdated);
+            labels.push(formattedTime);
             data.push(latestWaterLevel);
 
             // Keep only the last 10 data points for better visualization
