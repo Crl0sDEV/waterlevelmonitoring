@@ -1,395 +1,498 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Water Level Monitoring Dashboard</title>
     <!-- AdminLTE CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css"
+    />
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="custom.css">
-
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="custom.css" />
+  </head>
+  <body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <!-- Sidebar toggle button -->
         <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-                    <i class="fas fa-bars"></i>
-                </a>
-            </li>
+          <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+              <i class="fas fa-bars"></i>
+            </a>
+          </li>
         </ul>
-    </nav>
+      </nav>
 
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Main Sidebar Container -->
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a class="brand-link">
-            <img src="image/water-level-3-48.png" alt="Water Monitoring Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span class="brand-text font-weight-bold">Water Monitoring</span>
+          <img
+            src="image/water-level-3-48.png"
+            alt="Water Monitoring Logo"
+            class="brand-image img-circle elevation-3"
+            style="opacity: 0.8"
+          />
+          <span class="brand-text font-weight-bold">Water Monitoring</span>
         </a>
 
         <!-- Sidebar -->
         <div class="sidebar">
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Dashboard -->
-                    <li class="nav-item">
-                        <a href="/dashboard" class="nav-link active">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
-                    <!-- Real-time Monitoring -->
-                    <li class="nav-item">
-                        <a href="/realtime" class="nav-link">
-                            <i class="nav-icon fas fa-water"></i>
-                            <p>Real-time Monitoring</p>
-                        </a>
-                    </li>
-                    <!-- Alerts -->
-                    <li class="nav-item">
-                        <a href="/alerts" class="nav-link">
-                            <i class="nav-icon fas fa-bell"></i>
-                            <p>Alerts</p>
-                        </a>
-                    </li>
-                    <!-- History -->
-                    <li class="nav-item">
-                        <a href="/history" class="nav-link">
-                            <i class="nav-icon fas fa-history"></i>
-                            <p>History</p>
-                        </a>
-                    </li>
-                    <!-- Settings -->
-                    <li class="nav-item">
-                        <a href="/settings" class="nav-link">
-                            <i class="nav-icon fas fa-cog"></i>
-                            <p>Settings</p>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+          <!-- Sidebar Menu -->
+          <nav class="mt-2">
+            <ul
+              class="nav nav-pills nav-sidebar flex-column"
+              data-widget="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <!-- Dashboard -->
+              <li class="nav-item">
+                <a href="/dashboard" class="nav-link active">
+                  <i class="nav-icon fas fa-tachometer-alt"></i>
+                  <p>Dashboard</p>
+                </a>
+              </li>
+              <!-- Real-time Monitoring -->
+              <li class="nav-item">
+                <a href="/realtime" class="nav-link">
+                  <i class="nav-icon fas fa-water"></i>
+                  <p>Real-time Monitoring</p>
+                </a>
+              </li>
+              <!-- Alerts -->
+              <li class="nav-item">
+                <a href="/alerts" class="nav-link">
+                  <i class="nav-icon fas fa-bell"></i>
+                  <p>Alerts</p>
+                </a>
+              </li>
+              <!-- History -->
+              <li class="nav-item">
+                <a href="/history" class="nav-link">
+                  <i class="nav-icon fas fa-history"></i>
+                  <p>History</p>
+                </a>
+              </li>
+              <!-- Settings -->
+              <li class="nav-item">
+                <a href="/settings" class="nav-link">
+                  <i class="nav-icon fas fa-cog"></i>
+                  <p>Settings</p>
+                </a>
+              </li>
+            </ul>
+          </nav>
 
-            <!-- /.sidebar-menu -->
+          <!-- /.sidebar-menu -->
         </div>
         <!-- /.sidebar -->
-    </aside>
+      </aside>
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Dashboard</h1>
-                    </div>
-                </div>
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class="m-0">Dashboard</h1>
+              </div>
             </div>
+          </div>
         </div>
         <!-- /.content-header -->
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
-                <!-- Small boxes (Stat box) -->
-                <div class="row">
-                    <!-- Water Level Card -->
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3></h3>
-                                <p>Water Level (m)</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-water"></i>
-                            </div>
-                            <a href="/realtime" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-                    <!-- Alerts Card -->
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-danger">
-                            <div class="inner">
-                                <h3>4</h3>
-                                <p>Alerts</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <a href="/alerts" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-                    <!-- History Card -->
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
-                            <div class="inner">
-                                <h3>5</h3>
-                                <p>History Records</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-history"></i>
-                            </div>
-                            <a href="/history" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-                    <!-- Real-time Clock Card -->
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-secondary">
-                            <div class="inner">
-                                <h3 id="time">--:--</h3>
-                                <p>Real-time Clock</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <p class="text-center small-box-footer" id="date"></p>
-                        </div>
-                    </div>
-
+          <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+              <!-- Water Level Card -->
+              <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                  <div class="inner">
+                    <h3></h3>
+                    <p>Water Level (m)</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-water"></i>
+                  </div>
+                  <a href="/realtime" class="small-box-footer"
+                    >More info <i class="fas fa-arrow-circle-right"></i
+                  ></a>
                 </div>
-
-                <!-- Graph -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Water Level Trends</h3>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="waterLevelChart" style="height: 250px;"></canvas>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <!-- Alerts Card -->
+              <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                  <div class="inner">
+                    <h3>4</h3>
+                    <p>Alerts</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-bell"></i>
+                  </div>
+                  <a href="/alerts" class="small-box-footer"
+                    >More info <i class="fas fa-arrow-circle-right"></i
+                  ></a>
                 </div>
-            </div><!-- /.container-fluid -->
+              </div>
+              <!-- History Card -->
+              <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                  <div class="inner">
+                    <h3>5</h3>
+                    <p>History Records</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-history"></i>
+                  </div>
+                  <a href="/history" class="small-box-footer"
+                    >More info <i class="fas fa-arrow-circle-right"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- Real-time Clock Card -->
+              <div class="col-lg-3 col-6">
+                <div class="small-box bg-secondary">
+                  <div class="inner">
+                    <h3 id="time">--:--</h3>
+                    <p>Real-time Clock</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <p class="text-center small-box-footer" id="date"></p>
+                </div>
+              </div>
+            </div>
 
+            <!-- Graph -->
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Water Level Trends</h3>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="waterLevelChart" style="height: 250px"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
         </section>
         <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
+      </div>
+      <!-- /.content-wrapper -->
 
-    <!-- Footer -->
-    <footer class="main-footer">
+      <!-- Footer -->
+      <footer class="main-footer">
         <strong>Water Monitoring System</strong>
         <div class="float-right d-none d-sm-inline-block">
-            <b>Version</b> 1.0
+          <b>Version</b> 1.0
         </div>
-    </footer>
-    <!-- /.footer -->
-</div>
-<!-- ./wrapper -->
-<!-- Toast Notification -->
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="waterLevelToast" class="toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Warning: Water level is critically high!
-            </div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
+      </footer>
+      <!-- /.footer -->
     </div>
-</div>
+    <!-- ./wrapper -->
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      <div
+        id="waterLevelToast"
+        class="toast align-items-center text-bg-warning border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">Warning: Water level is critically high!</div>
+          <button
+            type="button"
+            class="btn-close me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
 
-<audio id="toastSound">
-    <source src="sound/alarm.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-</audio>
+    <audio id="toastSound">
+      <source src="sound/alarm.mp3" type="audio/mp3" />
+      Your browser does not support the audio element.
+    </audio>
 
-<!-- AdminLTE JS -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- jQuery (required by AdminLTE) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('waterLevelChart').getContext('2d');
-    const waterLevelChart = new Chart(ctx, {
-        type: 'line', // Changed from 'bar' to 'line'
+    <!-- jQuery (required by AdminLTE) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const ctx = document.getElementById("waterLevelChart").getContext("2d");
+      const waterLevelChart = new Chart(ctx, {
+        type: "line", // Changed from 'bar' to 'line'
         data: {
-            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], // Months
-            datasets: [{
-                label: 'Water Level (m)',
-                data: [1, 2, 1, 4, 5, 3], // Example water level data
-                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Transparent fill
-                borderColor: 'rgba(54, 162, 235, 1)', // Line color
-                borderWidth: 2, // Line thickness
-                tension: 0.4, // Smoothness of the line
-                fill: true // Enable fill under the line
-            }]
+          labels: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ], // Months
+          datasets: [
+            {
+              label: "Water Level (m)",
+              data: [1, 2, 1, 4, 5, 3], // Example water level data
+              backgroundColor: "rgba(54, 162, 235, 0.2)", // Transparent fill
+              borderColor: "rgba(54, 162, 235, 1)", // Line color
+              borderWidth: 2, // Line thickness
+              tension: 0.4, // Smoothness of the line
+              fill: true, // Enable fill under the line
+            },
+          ],
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: true, // Show legend
-                    position: 'top'
-                },
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true, // Show legend
+              position: "top",
             },
-            scales: {
-                y: {
-                    beginAtZero: true, // Start y-axis at 0
-                    title: {
-                        display: true,
-                        text: 'Water Level (m)' // Label for y-axis
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Day' // Label for x-axis
-                    }
-                }
-            }
-        }
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+          },
+          scales: {
+            y: {
+              beginAtZero: true, // Start y-axis at 0
+              title: {
+                display: true,
+                text: "Water Level (m)", // Label for y-axis
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: "Day", // Label for x-axis
+              },
+            },
+          },
+        },
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
         function showToast() {
-            const toastElement = document.getElementById('waterLevelToast');
-            const toast = new bootstrap.Toast(toastElement, {
-                autohide: true,
-                delay: 5000
-            });
+          const toastElement = document.getElementById("waterLevelToast");
+          const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 5000,
+          });
 
-            const audio = document.getElementById('toastSound');
-            audio.play().catch(error => {
-                console.error("Audio playback blocked or failed:", error);
-            });
+          const audio = document.getElementById("toastSound");
+          audio.play().catch((error) => {
+            console.error("Audio playback blocked or failed:", error);
+          });
 
-            toast.show();
+          toast.show();
         }
 
         // Show toast and play sound after 3 seconds
         setTimeout(() => {
-            showToast();
+          showToast();
         }, 3000);
-    });
-</script>
+      });
+    </script>
 
-<script>
-    // Update the clock and date every second
-    function updateTime() {
-        const options = { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' };
-        const time = new Date().toLocaleTimeString('en-US', options);
-        const date = new Date().toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    <script>
+      // Update the clock and date every second
+      function updateTime() {
+        const options = {
+          timeZone: "Asia/Manila",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        const time = new Date().toLocaleTimeString("en-US", options);
+        const date = new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
 
-        document.getElementById('time').textContent = time;
-        document.getElementById('date').textContent = date;
-    }
+        document.getElementById("time").textContent = time;
+        document.getElementById("date").textContent = date;
+      }
 
-    setInterval(updateTime, 1000); // Update every second
-    updateTime(); // Initial call to set the time immediately
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+      setInterval(updateTime, 1000); // Update every second
+      updateTime(); // Initial call to set the time immediately
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
 
         toggleButton.addEventListener("click", () => {
-            document.body.classList.toggle("sidebar-collapse");
+          document.body.classList.toggle("sidebar-collapse");
         });
-    });
-</script>
-<script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+      });
+    </script>
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const SUPABASE_URL = "https://efirubankmowqztlyuuh.supabase.co"; // Replace with your Supabase URL
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog"; // Replace with your Supabase API key
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Request notification permission
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                console.log("Notification permission granted.");
-            }
+      // Request notification permission
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted.");
+          }
         });
-    }
+      }
 
-    // Flag to track if the notification has been shown
-    let notificationShown = false;
+      // Flag to track if the notification has been shown
+      let notificationShown = false;
 
-    // Show toast notification
-    function showToast() {
-        const toastElement = document.getElementById('waterLevelToast');
+      // Show toast notification
+      function showToast() {
+        const toastElement = document.getElementById("waterLevelToast");
         const toast = new bootstrap.Toast(toastElement, {
-            autohide: true,
-            delay: 5000
+          autohide: true,
+          delay: 5000,
         });
 
-        const audio = document.getElementById('toastSound');
-        audio.play().catch(error => {
-            console.error("Audio playback blocked or failed:", error);
+        const audio = document.getElementById("toastSound");
+        audio.play().catch((error) => {
+          console.error("Audio playback blocked or failed:", error);
         });
 
         toast.show();
-    }
+      }
 
-    // Show browser notification
-    function showNotification(title, message) {
+      // Show browser notification
+      function showNotification(title, message) {
         if (Notification.permission === "granted") {
-            new Notification(title, {
-                body: message,
-                icon: "image/water-level-3-48.png" // Optional: Add an icon for the notification
-            });
+          new Notification(title, {
+            body: message,
+            icon: "image/water-level-3-48.png", // Optional: Add an icon for the notification
+          });
         }
-    }
+      }
 
-    // Fetch latest water level from Supabase
-    async function fetchLatestWaterLevel() {
+      // Fetch latest water level from Supabase
+      async function fetchLatestWaterLevel() {
         try {
-            const { data, error } = await supabase
-                .from("water_levels") // Replace with your table name
-                .select("*")
-                .order("last_updated", { ascending: false }) // Replace 'timestamp' with your timestamp column
-                .limit(1);
+          const { data, error } = await supabase
+            .from("water_levels") // Replace with your table name
+            .select("*")
+            .order("last_updated", { ascending: false }) // Replace 'timestamp' with your timestamp column
+            .limit(1);
 
-            if (error) {
-                console.error("Error fetching data:", error);
-                return;
+          if (error) {
+            console.error("Error fetching data:", error);
+            return;
+          }
+
+          if (data && data.length > 0) {
+            const latestWaterLevel = data[0].water_level; // Replace 'level' with your column name for water level
+            document.querySelector(".small-box.bg-info .inner h3").textContent =
+              latestWaterLevel;
+
+            // Check if water level is 3m or above
+            if (latestWaterLevel >= 3) {
+              if (!notificationShown) {
+                showToast();
+                showNotification(
+                  "Water Level Alert",
+                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                );
+                notificationShown = true; // Set the flag to true to prevent duplicate notifications
+              }
+            } else {
+              // Reset the flag if the water level drops below 3m
+              notificationShown = false;
             }
-
-            if (data && data.length > 0) {
-                const latestWaterLevel = data[0].water_level; // Replace 'level' with your column name for water level
-                document.querySelector(".small-box.bg-info .inner h3").textContent = latestWaterLevel;
-
-                // Check if water level is 3m or above
-                if (latestWaterLevel >= 3) {
-                    if (!notificationShown) {
-                        showToast();
-                        showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
-                        notificationShown = true; // Set the flag to true to prevent duplicate notifications
-                    }
-                } else {
-                    // Reset the flag if the water level drops below 3m
-                    notificationShown = false;
-                }
-            }
+          }
         } catch (err) {
-            console.error("Error:", err);
+          console.error("Error:", err);
         }
-    }
+      }
 
-    // Fetch water level every 30 seconds
-    fetchLatestWaterLevel();
-    setInterval(fetchLatestWaterLevel, 30000);
-</script>
+      // Fetch water level every 30 seconds
+      fetchLatestWaterLevel();
+      setInterval(fetchLatestWaterLevel, 30000);
 
-</body>
+      // Subscribe to water level changes using Supabase Realtime
+      const channel = supabase
+        .channel("water-level-updates")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT", // Listen for new inserts
+            schema: "public",
+            table: "water_levels", // Replace with your table name
+          },
+          (payload) => {
+            const latestWaterLevel = payload.new.water_level; // Replace with your column name
+            console.log("New water level:", latestWaterLevel);
+
+            // Check if water level is 3m or above
+            if (latestWaterLevel >= 3) {
+              if (!notificationShown) {
+                showToast();
+                showNotification(
+                  "Water Level Alert",
+                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                );
+                notificationShown = true; // Set the flag to true to prevent duplicate notifications
+              }
+            } else {
+              // Reset the flag if the water level drops below 3m
+              notificationShown = false;
+            }
+          }
+        )
+        .subscribe();
+    </script>
+
+    <script>
+      // Register the service worker
+      if ("serviceWorker" in navigator && "PushManager" in window) {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log(
+              "Service Worker registered with scope:",
+              registration.scope
+            );
+          })
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+      }
+    </script>
+  </body>
 </html>
