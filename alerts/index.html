@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - Water Level Monitoring System</title>
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="custom.css">
+    <style>
+        .status-critical {
+            color: red;
+            font-weight: bold;
+        }
+        .status-high {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-moderate {
+            color: gold;
+            font-weight: bold;
+        }
+        .color-legend {
+            margin-top: 20px;
+        }
+        .color-legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        .color-box.critical {
+            background-color: red;
+        }
+        .color-box.high {
+            background-color: orange;
+        }
+        .color-box.moderate {
+            background-color: gold;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Sidebar toggle button -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a class="brand-link">
+            <img src="image/water-level-3-48.png" alt="Water Monitoring Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-bold">Water Monitoring</span>
+        </a>
+
+        <div class="sidebar">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a href="/dashboard/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/realtime/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-water"></i>
+                            <p>Real-time Monitoring</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/alerts/index.html" class="nav-link active">
+                            <i class="nav-icon fas fa-bell"></i>
+                            <p>Alerts</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/history/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>History</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/settings/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>Settings</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Alerts</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!-- Alerts Table -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Recent Alerts</h3>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Alert ID</th>
+                                            <th>Date & Time</th>
+                                            <th>Level</th>
+                                            <th>Status</th>
+                                            <th>Action Required</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be fetched and displayed here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Color Code Section -->
+<div class="color-legend-container">
+    <div class="color-legend-title">Color Code</div>
+    <div class="color-legend">
+        <div class="color-legend-item">
+            <div class="color-box critical"></div>
+            <span>Critical (Evacuate immediately)</span>
+        </div>
+        <div class="color-legend-item">
+            <div class="color-box high"></div>
+            <span>High (Prepare for possible evacuation)</span>
+        </div>
+        <div class="color-legend-item">
+            <div class="color-box moderate"></div>
+            <span>Moderate (Monitor closely)</span>
+        </div>
+    </div>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <strong>Water Monitoring System</strong>
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> 1.0
+        </div>
+    </footer>
+</div>
+
+<!-- AdminLTE JS -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<!-- jQuery (required by AdminLTE) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggleButton = document.querySelector('[data-widget="pushmenu"]');
+
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("sidebar-collapse");
+        });
+    });
+</script>
+<script type="module">
+    // Initialize Supabase client
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchAlerts() {
+    try {
+        const { data, error } = await supabase
+            .from('water_levels')
+            .select('id, water_level, last_updated')
+            .order('last_updated', { ascending: false }); // Order by last_updated in descending order
+
+        if (error) {
+            console.error('Error fetching data:', error);
+            return;
+        }
+
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = '';
+
+        data.forEach(alert => {
+            let status, actionRequired;
+            if (alert.water_level >= 3) {
+                status = 'Critical';
+                actionRequired = 'Evacuate immediately';
+            } else if (alert.water_level >= 2) {
+                status = 'High';
+                actionRequired = 'Prepare for possible evacuation';
+            } else {
+                status = 'Moderate';
+                actionRequired = 'Monitor closely';
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${alert.id}</td>
+                <td>${new Date(alert.last_updated).toLocaleString()}</td>
+                <td>${alert.water_level} m</td>
+                <td class="status-${status.toLowerCase()}">${status}</td>
+                <td>${actionRequired}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error('Unexpected error:', err);
+    }
+}
+
+    document.addEventListener('DOMContentLoaded', fetchAlerts);
+
+    setInterval(fetchAlerts, 10000);
+</script>
+
+</body>
+</html>

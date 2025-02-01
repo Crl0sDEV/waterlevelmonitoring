@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Monitoring - Water Level System</title>
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="custom.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Sidebar toggle button -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a class="brand-link">
+            <img src="image/water-level-3-48.png" alt="Water Monitoring Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-bold">Water Monitoring</span>
+        </a>
+
+        <div class="sidebar">
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item">
+                        <a href="/dashboard/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/realtime/index.html" class="nav-link active">
+                            <i class="nav-icon fas fa-water"></i>
+                            <p>Real-time Monitoring</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/alerts/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-bell"></i>
+                            <p>Alerts</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/history/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>History</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/settings/index.html" class="nav-link">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>Settings</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Real-time Water Level Monitoring</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!-- Real-time Data Display Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Current Water Level</h3>
+                            </div>
+                            <div class="card-body">
+                                <h2 id="waterLevel"></h2>
+                                <p>Last updated: <span id="lastUpdated"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Line Chart -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Water Level Over Time (Line Chart)</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="lineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bar Chart -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Water Level Comparison (Bar Chart)</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <strong>Water Monitoring System</strong>
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> 1.0
+        </div>
+    </footer>
+</div>
+
+<!-- AdminLTE JS -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Line Chart
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: ['1 AM', '2 AM', '3 AM', '4 AM', '5 AM'],
+            datasets: [{
+                label: 'Water Level (m)',
+                data: [4.5, 4.8, 4.2, 5.0, 5.3],
+                borderColor: 'blue',
+                tension: 0.4,
+                fill: false
+            }]
+        }
+    });
+
+    // Bar Chart
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+            datasets: [{
+                label: 'Water Level (m)',
+                data: [5.0, 4.8, 5.2, 4.6],
+                backgroundColor: 'lightblue'
+            }]
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggleButton = document.querySelector('[data-widget="pushmenu"]');
+
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("sidebar-collapse");
+        });
+    });
+</script>
+
+<script type="module">
+    // Supabase Initialization
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabaseUrl = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase anon key
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function fetchWaterLevelData() {
+        try {
+            const { data, error } = await supabase
+                .from('water_levels')
+                .select('*')
+                .order('last_updated', { ascending: false })
+                .limit(1);
+
+            if (error) {
+                console.error('Error fetching water level data:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                const latest = data[0];
+                document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
+                document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err);
+        }
+    }
+
+    // Fetch data every 10 seconds
+    setInterval(fetchWaterLevelData, 10000);
+
+    // Fetch data immediately when the page loads
+    document.addEventListener("DOMContentLoaded", fetchWaterLevelData);
+</script>
+
+</body>
+</html>
