@@ -420,6 +420,21 @@
             const latestWaterLevel = data[0].water_level; // Replace 'level' with your column name for water level
             document.querySelector(".small-box.bg-info .inner h3").textContent =
               latestWaterLevel;
+
+            // Check if water level is 3m or above
+            if (latestWaterLevel >= 3) {
+              if (!notificationShown) {
+                showToast();
+                showNotification(
+                  "Water Level Alert",
+                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                );
+                notificationShown = true; // Set the flag to true to prevent duplicate notifications
+              }
+            } else {
+              // Reset the flag if the water level drops below 3m
+              notificationShown = false;
+            }
           }
         } catch (err) {
           console.error("Error:", err);
