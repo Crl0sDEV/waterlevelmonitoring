@@ -142,20 +142,44 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Line Chart
+    // Initialize the line chart
     const lineCtx = document.getElementById('lineChart').getContext('2d');
-    new Chart(lineCtx, {
+    const lineChart = new Chart(lineCtx, {
         type: 'line',
         data: {
-            labels: ['1 AM', '2 AM', '3 AM', '4 AM', '5 AM'],
+            labels: [], // Will be populated dynamically
             datasets: [{
                 label: 'Water Level (m)',
-                data: [4.5, 4.8, 4.2, 5.0, 5.3],
+                data: [], // Will be populated dynamically
                 borderColor: 'blue',
                 tension: 0.4,
                 fill: false
             }]
-        }
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Water Level (m)',
+                    },
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time',
+                    },
+                },
+            },
+        },
     });
 
     // Bar Chart
@@ -203,6 +227,13 @@
         }
     }
 
+    // Function to update the line chart
+    function updateChart(labels, data) {
+        lineChart.data.labels = labels;
+        lineChart.data.datasets[0].data = data;
+        lineChart.update();
+    }
+
     // Subscribe to water level changes using Supabase Realtime
     const channel = supabase
         .channel('water-level-updates')
@@ -212,7 +243,28 @@
             table: 'water_levels', // Replace with your table name
         }, (payload) => {
             const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            console.log('New water level:', latestWaterLevel);
+            const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
+
+            // Update the current water level display
+            document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
+            document.getElementById('lastUpdated').innerText = lastUpdated;
+
+            // Update the chart
+            const labels = lineChart.data.labels;
+            const data = lineChart.data.datasets[0].data;
+
+            // Add new data to the chart
+            labels.push(lastUpdated);
+            data.push(latestWaterLevel);
+
+            // Keep only the last 10 data points for better visualization
+            if (labels.length > 10) {
+                labels.shift();
+                data.shift();
+            }
+
+            // Update the chart
+            updateChart(labels, data);
 
             // Check if water level is 3m or above
             if (latestWaterLevel >= 3) {
@@ -227,20 +279,28 @@
         })
         .subscribe();
 
-    async function fetchWaterLevelData() {
+    // Fetch initial data to populate the chart
+    async function fetchInitialData() {
         try {
             const { data, error } = await supabase
                 .from('water_levels')
                 .select('*')
                 .order('last_updated', { ascending: false })
-                .limit(1);
+                .limit(10); // Fetch the last 10 records
 
             if (error) {
-                console.error('Error fetching water level data:', error);
+                console.error('Error fetching initial data:', error);
                 return;
             }
 
             if (data && data.length > 0) {
+                const labels = data.map(entry => new Date(entry.last_updated).toLocaleString()).reverse();
+                const waterLevels = data.map(entry => entry.water_level).reverse();
+
+                // Update the chart with initial data
+                updateChart(labels, waterLevels);
+
+                // Update the current water level display
                 const latest = data[0];
                 document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
                 document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
@@ -250,11 +310,8 @@
         }
     }
 
-    // Fetch data every 10 seconds
-    setInterval(fetchWaterLevelData, 10000);
-
-    // Fetch data immediately when the page loads
-    document.addEventListener("DOMContentLoaded", fetchWaterLevelData);
+    // Fetch initial data when the page loads
+    document.addEventListener("DOMContentLoaded", fetchInitialData);
 </script>
 
 <!-- Register the service worker -->
