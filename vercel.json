@@ -1,0 +1,10 @@
+{
+    "rewrites": [
+      { "source": "/alerts", "destination": "/alerts.html" },
+      { "source": "/dashboard", "destination": "/dashboard.html" },
+      { "source": "/realtime", "destination": "/realtime.html" },
+      { "source": "/history", "destination": "/history.html" },
+      { "source": "/settings", "destination": "/settings.html" }
+    ]
+  }
+  
