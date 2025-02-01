@@ -286,7 +286,7 @@
                 .from('water_levels')
                 .select('*')
                 .order('last_updated', { ascending: false })
-                .limit(10); // Fetch the last 10 records
+                .limit(5); // Fetch the last 10 records
 
             if (error) {
                 console.error('Error fetching initial data:', error);
