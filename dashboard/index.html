@@ -18,6 +18,11 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <!-- Flatpickr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
     <link rel="stylesheet" href="custom.css" />
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
@@ -184,6 +189,15 @@
                 <div class="card">
                   <div class="card-header">
                     <h3 class="card-title">Water Level Trends</h3>
+                    <!-- Date Range Picker -->
+                    <div class="float-right">
+                      <input
+                        type="text"
+                        id="dateRangePicker"
+                        class="form-control"
+                        placeholder="Select Date Range"
+                      />
+                    </div>
                   </div>
                   <div class="card-body">
                     <canvas id="waterLevelChart" style="height: 250px"></canvas>
@@ -224,57 +238,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      const ctx = document.getElementById("waterLevelChart").getContext("2d");
-      const waterLevelChart = new Chart(ctx, {
-        type: "line", // Changed from 'bar' to 'line'
-        data: {
-          labels: [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ], // Months
-          datasets: [
-            {
-              label: "Water Level (m)",
-              data: [1, 2, 1, 4, 5, 3], // Example water level data
-              backgroundColor: "rgba(54, 162, 235, 0.2)", // Transparent fill
-              borderColor: "rgba(54, 162, 235, 1)", // Line color
-              borderWidth: 2, // Line thickness
-              tension: 0.4, // Smoothness of the line
-              fill: true, // Enable fill under the line
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: true, // Show legend
-              position: "top",
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true, // Start y-axis at 0
-              title: {
-                display: true,
-                text: "Water Level (m)", // Label for y-axis
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: "Day", // Label for x-axis
-              },
-            },
-          },
-        },
-      });
-    </script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
       // Update the clock and date every second
@@ -315,6 +280,101 @@
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog"; // Replace with your Supabase API key
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // Initialize Flatpickr for date range selection
+      const dateRangePicker = flatpickr("#dateRangePicker", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onChange: async function (selectedDates) {
+          if (selectedDates.length === 2) {
+            const [startDate, endDate] = selectedDates;
+            await fetchWaterLevelData(startDate, endDate);
+          }
+        },
+      });
+
+      // Chart.js initialization
+      const ctx = document.getElementById("waterLevelChart").getContext("2d");
+      const waterLevelChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [], // Will be populated dynamically
+          datasets: [
+            {
+              label: "Water Level (m)",
+              data: [], // Will be populated dynamically
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "Water Level (m)",
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: "Date",
+              },
+            },
+          },
+        },
+      });
+
+      // Fetch water level data from Supabase based on date range
+      async function fetchWaterLevelData(startDate, endDate) {
+        try {
+          const { data, error } = await supabase
+            .from("water_levels") // Replace with your table name
+            .select("*")
+            .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
+            .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
+            .order("last_updated", { ascending: true }); // Order by timestamp
+
+          if (error) {
+            console.error("Error fetching data:", error);
+            return;
+          }
+
+          if (data && data.length > 0) {
+            const labels = data.map((entry) =>
+              new Date(entry.last_updated).toLocaleDateString()
+            );
+            const waterLevels = data.map((entry) => entry.water_level);
+
+            // Update the chart
+            waterLevelChart.data.labels = labels;
+            waterLevelChart.data.datasets[0].data = waterLevels;
+            waterLevelChart.update();
+          } else {
+            console.log("No data found for the selected date range.");
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      }
+
+      // Fetch initial data (last 7 days by default)
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7); // Last 7 days
+      fetchWaterLevelData(startDate, endDate);
 
       // Request notification permission
       if (Notification.permission !== "granted") {
