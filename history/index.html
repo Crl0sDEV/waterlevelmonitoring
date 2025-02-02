@@ -49,6 +49,20 @@
         .color-box.moderate {
             background-color: gold;
         }
+
+        /* Add this CSS for the navbar */
+        .navbar-nav .nav-item {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-nav .nav-item .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        .navbar-nav .nav-item .history-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -62,6 +76,10 @@
                     <i class="fas fa-bars"></i>
                 </a>
             </li>
+        </li>
+        <li class="nav-item">
+            <span class="history-text">History</span>
+        </li>
         </ul>
     </nav>
 
@@ -112,16 +130,6 @@
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
-        <!-- Content Header -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">History</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Main Content -->
         <section class="content">
