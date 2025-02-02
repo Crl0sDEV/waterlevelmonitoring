@@ -276,28 +276,32 @@
 
     // Function to fetch and update the bar chart with the highest water level for each day
     async function updateBarChartData() {
-        try {
-            const { data, error } = await supabase
-                .from('water_levels')
-                .select('water_level, last_updated')
-                .order('last_updated', { ascending: false });
+    try {
+        const { data, error } = await supabase
+            .from('water_levels')
+            .select('water_level, last_updated')
+            .order('last_updated', { ascending: false });
 
-            if (error) {
-                console.error('Error fetching data for bar chart:', error);
-                return;
-            }
+        if (error) {
+            console.error('Error fetching data for bar chart:', error);
+            return;
+        }
 
-            if (data && data.length > 0) {
-                // Group data by day and find the highest water level for each day
-                const dailyMaxLevels = {};
-                data.forEach(entry => {
-                    const date = new Date(entry.last_updated).toLocaleDateString();
-                    if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
-                        dailyMaxLevels[date] = entry.water_level;
-                    }
-                });
+        if (data && data.length > 0) {
+            // Group data by day and find the highest water level for each day
+            const dailyMaxLevels = {};
+            data.forEach(entry => {
+                const date = new Date(entry.last_updated).toLocaleDateString();
+                if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
+                    dailyMaxLevels[date] = entry.water_level;
+                }
+            });
 
-                // Sort the labels and water levels by date in ascending order
+            // Convert the grouped data into arrays for labels and water levels
+            const labels = Object.keys(dailyMaxLevels);
+            const waterLevels = Object.values(dailyMaxLevels);
+
+            // Sort the labels and water levels by date in ascending order
             const sortedData = labels
                 .map((label, index) => ({
                     date: new Date(label), // Convert label to Date object for sorting
@@ -311,11 +315,11 @@
 
             // Update the bar chart with sorted data
             updateBarChart(sortedLabels, sortedWaterLevels);
-            }
-        } catch (err) {
-            console.error('Unexpected error:', err);
         }
+    } catch (err) {
+        console.error('Unexpected error:', err);
     }
+}
 
     // Subscribe to water level changes using Supabase Realtime
     const channel = supabase
