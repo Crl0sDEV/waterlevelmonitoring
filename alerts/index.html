@@ -16,10 +16,10 @@
     />
     <link rel="stylesheet" href="custom.css" />
     <style>
-        .table-container {
+      .table-container {
         max-height: 400px;
         overflow-y: auto;
-        }
+      }
       .status-critical {
         color: red;
         font-weight: bold;
@@ -115,26 +115,26 @@
                 <!-- Alerts Table -->
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Recent Alerts</h3>
+                    <h3 class="card-title">Recent Alerts (Water Level ≥ 3m)</h3>
                   </div>
                   <div class="card-body">
                     <div class="table-container">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Alert ID</th>
-                                    <th>Date & Time</th>
-                                    <th>Level</th>
-                                    <th>Status</th>
-                                    <th>Action Required</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data will be fetched and displayed here -->
-                            </tbody>
-                        </table>
+                      <table class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <th>Alert ID</th>
+                            <th>Date & Time</th>
+                            <th>Level</th>
+                            <th>Status</th>
+                            <th>Action Required</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Data will be fetched and displayed here -->
+                        </tbody>
+                      </table>
                     </div>
-                </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -232,17 +232,14 @@
           const tableBody = document.querySelector("table tbody");
           tableBody.innerHTML = "";
 
-          data.forEach((alert) => {
+          // Filter data to show only water levels ≥ 3m
+          const filteredData = data.filter((alert) => alert.water_level >= 3);
+
+          filteredData.forEach((alert) => {
             let status, actionRequired;
             if (alert.water_level >= 3) {
               status = "Critical";
               actionRequired = "Evacuate immediately";
-            } else if (alert.water_level >= 2) {
-              status = "High";
-              actionRequired = "Prepare for possible evacuation";
-            } else {
-              status = "Moderate";
-              actionRequired = "Monitor closely";
             }
 
             const row = document.createElement("tr");
