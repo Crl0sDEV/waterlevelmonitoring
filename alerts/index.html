@@ -16,6 +16,10 @@
     />
     <link rel="stylesheet" href="custom.css" />
     <style>
+        .table-container {
+        max-height: 400px;
+        overflow-y: auto;
+        }
       .status-critical {
         color: red;
         font-weight: bold;
@@ -114,21 +118,23 @@
                     <h3 class="card-title">Recent Alerts</h3>
                   </div>
                   <div class="card-body">
-                    <table class="table table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>Alert ID</th>
-                          <th>Date & Time</th>
-                          <th>Level</th>
-                          <th>Status</th>
-                          <th>Action Required</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <!-- Data will be fetched and displayed here -->
-                      </tbody>
-                    </table>
-                  </div>
+                    <div class="table-container">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Level</th>
+                                    <th>Status</th>
+                                    <th>Action Required</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be fetched and displayed here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 </div>
               </div>
             </div>
