@@ -182,24 +182,54 @@
         },
     });
 
-    // Bar Chart
+    // Initialize the bar chart
     const barCtx = document.getElementById('barChart').getContext('2d');
-    new Chart(barCtx, {
+    const barChart = new Chart(barCtx, {
         type: 'bar',
         data: {
-            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+            labels: [], // Will be populated dynamically
             datasets: [{
-                label: 'Water Level (m)',
-                data: [5.0, 4.8, 5.2, 4.6],
+                label: 'Highest Water Level (m)',
+                data: [], // Will be populated dynamically
                 backgroundColor: 'lightblue'
             }]
-        }
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Water Level (m)',
+                    },
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date',
+                    },
+                },
+            },
+        },
     });
+
+    // Function to update the bar chart
+    function updateBarChart(labels, data) {
+        barChart.data.labels = labels;
+        barChart.data.datasets[0].data = data;
+        barChart.update();
+    }
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
-
         toggleButton.addEventListener("click", () => {
             document.body.classList.toggle("sidebar-collapse");
         });
@@ -228,21 +258,56 @@
     }
 
     function updateChart(labels, data) {
-    const formattedLabels = labels.map(formatTime);
-    lineChart.data.labels = formattedLabels;
-    lineChart.data.datasets[0].data = data;
-    lineChart.update();
+        const formattedLabels = labels.map(formatTime);
+        lineChart.data.labels = formattedLabels;
+        lineChart.data.datasets[0].data = data;
+        lineChart.update();
     }
 
     function formatTime(dateString) {
-    const date = new Date(dateString);
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; // Convert to 12-hour format
-    const minutesFormatted = minutes < 10 ? '0' + minutes : minutes; // Pad minutes
-    return `${hours}:${minutesFormatted} ${ampm}`;
-}
+        const date = new Date(dateString);
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert to 12-hour format
+        const minutesFormatted = minutes < 10 ? '0' + minutes : minutes; // Pad minutes
+        return `${hours}:${minutesFormatted} ${ampm}`;
+    }
+
+    // Function to fetch and update the bar chart with the highest water level for each day
+    async function updateBarChartData() {
+        try {
+            const { data, error } = await supabase
+                .from('water_levels')
+                .select('water_level, last_updated')
+                .order('last_updated', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching data for bar chart:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                // Group data by day and find the highest water level for each day
+                const dailyMaxLevels = {};
+                data.forEach(entry => {
+                    const date = new Date(entry.last_updated).toLocaleDateString();
+                    if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
+                        dailyMaxLevels[date] = entry.water_level;
+                    }
+                });
+
+                // Extract labels and data for the bar chart
+                const labels = Object.keys(dailyMaxLevels);
+                const waterLevels = Object.values(dailyMaxLevels);
+
+                // Update the bar chart
+                updateBarChart(labels, waterLevels);
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err);
+        }
+    }
 
     // Subscribe to water level changes using Supabase Realtime
     const channel = supabase
@@ -260,7 +325,7 @@
             document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
             document.getElementById('lastUpdated').innerText = lastUpdated;
 
-            // Update the chart
+            // Update the line chart
             const labels = lineChart.data.labels;
             const data = lineChart.data.datasets[0].data;
 
@@ -277,6 +342,9 @@
             // Update the chart
             updateChart(labels, data);
 
+            // Update the bar chart with the latest data
+            updateBarChartData();
+
             // Check if water level is 3m or above
             if (latestWaterLevel >= 3) {
                 if (!notificationShown) {
@@ -290,14 +358,14 @@
         })
         .subscribe();
 
-    // Fetch initial data to populate the chart
+    // Fetch initial data to populate the charts
     async function fetchInitialData() {
         try {
             const { data, error } = await supabase
                 .from('water_levels')
                 .select('*')
                 .order('last_updated', { ascending: false })
-                .limit(5); // Fetch the last 10 records
+                .limit(5); // Fetch the last 5 records
 
             if (error) {
                 console.error('Error fetching initial data:', error);
@@ -308,7 +376,7 @@
                 const labels = data.map(entry => new Date(entry.last_updated).toLocaleString()).reverse();
                 const waterLevels = data.map(entry => entry.water_level).reverse();
 
-                // Update the chart with initial data
+                // Update the line chart with initial data
                 updateChart(labels, waterLevels);
 
                 // Update the current water level display
@@ -322,7 +390,10 @@
     }
 
     // Fetch initial data when the page loads
-    document.addEventListener("DOMContentLoaded", fetchInitialData);
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchInitialData();
+        updateBarChartData(); // Fetch and update the bar chart data
+    });
 </script>
 
 <!-- Register the service worker -->
