@@ -3,12 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History - Water Level Monitoring System</title>
+    <title>Alerts - Water Level Monitoring System</title>
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="custom.css">
+    <style>
+        .status-critical {
+            color: red;
+            font-weight: bold;
+        }
+        .status-high {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-moderate {
+            color: gold;
+            font-weight: bold;
+        }
+        .color-legend {
+            margin-top: 20px;
+        }
+        .color-legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        .color-box.critical {
+            background-color: red;
+        }
+        .color-box.high {
+            background-color: orange;
+        }
+        .color-box.moderate {
+            background-color: gold;
+        }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -47,13 +84,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/alerts" class="nav-link">
+                        <a href="/alerts" class="nav-link active">
                             <i class="nav-icon fas fa-bell"></i>
                             <p>Alerts</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/history" class="nav-link active">
+                        <a href="/history" class="nav-link">
                             <i class="nav-icon fas fa-history"></i>
                             <p>History</p>
                         </a>
@@ -76,7 +113,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Water Level History</h1>
+                        <h1 class="m-0">History</h1>
                     </div>
                 </div>
             </div>
@@ -87,58 +124,47 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <!-- History Table -->
+                        <!-- Alerts Table -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Historical Water Levels</h3>
+                                <h3 class="card-title">Water Level History</h3>
                             </div>
                             <div class="card-body">
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Date</th>
-                                            <th>Time</th>
-                                            <th>Water Level (m)</th>
-                                            <th>Observations</th>
+                                            <th>Alert ID</th>
+                                            <th>Date & Time</th>
+                                            <th>Level</th>
+                                            <th>Status</th>
+                                            <th>Action Required</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Static data -->
-                                        <tr>
-                                            <td>2024-11-13</td>
-                                            <td>14:30</td>
-                                            <td>1</td>
-                                            <td>Normal level</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2024-11-12</td>
-                                            <td>09:15</td>
-                                            <td>2</td>
-                                            <td>Slight increase</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2024-11-11</td>
-                                            <td>17:45</td>
-                                            <td>5</td>
-                                            <td>Critical level reached</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2024-11-10</td>
-                                            <td>07:30</td>
-                                            <td>1</td>
-                                            <td>Normal</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2024-11-09</td>
-                                            <td>23:00</td>
-                                            <td>3</td>
-                                            <td>Minor fluctuations</td>
-                                        </tr>
-                                        <!-- End of static data -->
+                                        <!-- Data will be fetched and displayed here -->
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <!-- Color Code Section -->
+<div class="color-legend-container">
+    <div class="color-legend-title">Color Code</div>
+    <div class="color-legend">
+        <div class="color-legend-item">
+            <div class="color-box critical"></div>
+            <span>Critical (Evacuate immediately)</span>
+        </div>
+        <div class="color-legend-item">
+            <div class="color-box high"></div>
+            <span>High (Prepare for possible evacuation)</span>
+        </div>
+        <div class="color-legend-item">
+            <div class="color-box moderate"></div>
+            <span>Moderate (Monitor closely)</span>
+        </div>
+    </div>
+</div>
+
                     </div>
                 </div>
             </div>
@@ -158,8 +184,17 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <!-- jQuery (required by AdminLTE) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Add Supabase and Notification Logic -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toggleButton = document.querySelector('[data-widget="pushmenu"]');
+
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("sidebar-collapse");
+        });
+    });
+</script>
 <script type="module">
+    // Initialize Supabase client
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
@@ -202,6 +237,53 @@
             }
         })
         .subscribe();
+
+    async function fetchAlerts() {
+    try {
+        const { data, error } = await supabase
+            .from('water_levels')
+            .select('id, water_level, last_updated')
+            .order('last_updated', { ascending: false }); // Order by last_updated in descending order
+
+        if (error) {
+            console.error('Error fetching data:', error);
+            return;
+        }
+
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = '';
+
+        data.forEach(alert => {
+            let status, actionRequired;
+            if (alert.water_level >= 3) {
+                status = 'Critical';
+                actionRequired = 'Evacuate immediately';
+            } else if (alert.water_level >= 2) {
+                status = 'High';
+                actionRequired = 'Prepare for possible evacuation';
+            } else {
+                status = 'Moderate';
+                actionRequired = 'Monitor closely';
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${alert.id}</td>
+                <td>${new Date(alert.last_updated).toLocaleString()}</td>
+                <td>${alert.water_level} m</td>
+                <td class="status-${status.toLowerCase()}">${status}</td>
+                <td>${actionRequired}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error('Unexpected error:', err);
+    }
+}
+
+    document.addEventListener('DOMContentLoaded', fetchAlerts);
+
+    setInterval(fetchAlerts, 10000);
 </script>
 
 <!-- Register the service worker -->
@@ -217,14 +299,5 @@
     }
 </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const toggleButton = document.querySelector('[data-widget="pushmenu"]');
-
-        toggleButton.addEventListener("click", () => {
-            document.body.classList.toggle("sidebar-collapse");
-        });
-    });
-</script>
 </body>
 </html>
