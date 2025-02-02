@@ -297,12 +297,20 @@
                     }
                 });
 
-                // Extract labels and data for the bar chart
-                const labels = Object.keys(dailyMaxLevels);
-                const waterLevels = Object.values(dailyMaxLevels);
+                // Sort the labels and water levels by date in ascending order
+            const sortedData = labels
+                .map((label, index) => ({
+                    date: new Date(label), // Convert label to Date object for sorting
+                    level: waterLevels[index],
+                }))
+                .sort((a, b) => a.date - b.date); // Sort by date in ascending order
 
-                // Update the bar chart
-                updateBarChart(labels, waterLevels);
+            // Extract sorted labels and water levels
+            const sortedLabels = sortedData.map(entry => entry.date.toLocaleDateString());
+            const sortedWaterLevels = sortedData.map(entry => entry.level);
+
+            // Update the bar chart with sorted data
+            updateBarChart(sortedLabels, sortedWaterLevels);
             }
         } catch (err) {
             console.error('Unexpected error:', err);
