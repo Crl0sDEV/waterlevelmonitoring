@@ -24,6 +24,15 @@
       href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
     />
     <link rel="stylesheet" href="custom.css" />
+    <style>
+      /* Add this CSS to remove the underline effect */
+      .brand-link:hover {
+        text-decoration: none; /* Remove underline on hover */
+      }
+      .brand-link .brand-text {
+        text-decoration: none; /* Ensure no underline is applied to the text */
+      }
+    </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -125,7 +134,7 @@
               <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
                   <div class="inner">
-                    <h3>4</h3>
+                    <h3>0</h3>
                     <p>Alerts</p>
                   </div>
                   <div class="icon">
@@ -418,6 +427,8 @@
                   );
                   localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
                 }
+                // Update the alerts count
+                fetchHighWaterLevelCount();
               } else {
                 // Reset the flag if the water level drops below 3m
                 localStorage.setItem("notificationShown", "false");
@@ -473,7 +484,32 @@
         }
       }
 
+      async function fetchHighWaterLevelCount() {
+        try {
+          const { count, error } = await supabase
+            .from("water_levels")
+            .select("*", { count: "exact", head: true })
+            .gte("water_level", 3);
+
+          if (error) {
+            console.error("Error fetching high water level count:", error);
+            return;
+          }
+
+          const alertsCard = document.querySelector(".small-box.bg-danger .inner h3");
+          if (alertsCard) {
+            alertsCard.textContent = count;
+            console.log("Alerts card updated:", count);
+          } else {
+            console.error("Alerts card element not found!");
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      }
+
       fetchLatestWaterLevel();
+      fetchHighWaterLevelCount();
     </script>
 
     <script>
@@ -494,4 +530,3 @@
     </script>
   </body>
 </html>
-
