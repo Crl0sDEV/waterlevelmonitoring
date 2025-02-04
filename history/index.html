@@ -27,12 +27,14 @@
             font-weight: bold;
         }
         .color-legend {
-            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Push the legend to the right */
         }
         .color-legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-left: 15px; /* Add some space between items */
         }
         .color-box {
             width: 20px;
@@ -49,7 +51,11 @@
         .color-box.moderate {
             background-color: gold;
         }
-
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space between title and legend */
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -121,6 +127,21 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Water Level History</h3>
+                                <!-- Color Code Section -->
+                                <div class="color-legend">
+                                    <div class="color-legend-item">
+                                        <div class="color-box critical"></div>
+                                        <span>Critical (Evacuate immediately)</span>
+                                    </div>
+                                    <div class="color-legend-item">
+                                        <div class="color-box high"></div>
+                                        <span>High (Prepare for possible evacuation)</span>
+                                    </div>
+                                    <div class="color-legend-item">
+                                        <div class="color-box moderate"></div>
+                                        <span>Moderate (Monitor closely)</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-container">
@@ -141,25 +162,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Color Code Section -->
-<div class="color-legend-container">
-    <div class="color-legend-title">Color Code</div>
-    <div class="color-legend">
-        <div class="color-legend-item">
-            <div class="color-box critical"></div>
-            <span>Critical (Evacuate immediately)</span>
-        </div>
-        <div class="color-legend-item">
-            <div class="color-box high"></div>
-            <span>High (Prepare for possible evacuation)</span>
-        </div>
-        <div class="color-legend-item">
-            <div class="color-box moderate"></div>
-            <span>Moderate (Monitor closely)</span>
-        </div>
-    </div>
-</div>
-
                     </div>
                 </div>
             </div>
