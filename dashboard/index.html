@@ -24,38 +24,6 @@
       href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
     />
     <link rel="stylesheet" href="custom.css" />
-    <style>
-      /* Add this CSS to remove the underline effect */
-      .brand-link:hover {
-        text-decoration: none; /* Remove underline on hover */
-      }
-      .brand-link .brand-text {
-        text-decoration: none; /* Ensure no underline is applied to the text */
-      }
-      body {
-      font-family: sans-serif;
-    }
-    .container {
-      display: flex;
-      justify-content: space-around;
-    }
-    .small-box {
-      border-radius: 5px;
-      padding: 20px;
-      margin: 10px;
-      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .bg-info {
-      background-color: #17a2b8;
-      color: white;
-    }
-    .inner {
-      text-align: center;
-    }
-    canvas {
-      max-width: 600px;
-    }
-    </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -142,7 +110,7 @@
               <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                   <div class="inner">
-                    <h3 id="waterLevelDisplay">0.00</h3>
+                    <h3 id="waterLevelDisplay">0</h3>
                     <p>Water Level (m)</p>
                   </div>
                   <div class="icon">
