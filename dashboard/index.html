@@ -267,12 +267,12 @@
     </script>
     <script type="module">
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
+    
       const SUPABASE_URL = "https://efirubankmowqztlyuuh.supabase.co"; // Replace with your Supabase URL
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog"; // Replace with your Supabase API key
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
+    
       // Initialize Flatpickr for date range selection
       const dateRangePicker = flatpickr("#dateRangePicker", {
         mode: "range",
@@ -284,7 +284,7 @@
           }
         },
       });
-
+    
       // Chart.js initialization
       const ctx = document.getElementById("waterLevelChart").getContext("2d");
       const waterLevelChart = new Chart(ctx, {
@@ -328,7 +328,7 @@
           },
         },
       });
-
+    
       // Fetch water level data from Supabase based on date range
       async function fetchWaterLevelData(startDate, endDate) {
         try {
@@ -338,18 +338,18 @@
             .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
             .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
             .order("last_updated", { ascending: true }); // Order by timestamp
-
+    
           if (error) {
             console.error("Error fetching data:", error);
             return;
           }
-
+    
           if (data && data.length > 0) {
             const labels = data.map((entry) =>
               new Date(entry.last_updated).toLocaleDateString()
             );
             const waterLevels = data.map((entry) => entry.water_level);
-
+    
             // Update the chart
             waterLevelChart.data.labels = labels;
             waterLevelChart.data.datasets[0].data = waterLevels;
@@ -361,13 +361,13 @@
           console.error("Error:", err);
         }
       }
-
+    
       // Fetch initial data (last 7 days by default)
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(endDate.getDate() - 7); // Last 7 days
       fetchWaterLevelData(startDate, endDate);
-
+    
       // Request notification permission
       if (Notification.permission !== "granted") {
         Notification.requestPermission().then((permission) => {
@@ -376,7 +376,7 @@
           }
         });
       }
-
+    
       // Show browser notification
       function showNotification(title, message) {
         if (Notification.permission === "granted") {
@@ -386,7 +386,7 @@
           });
         }
       }
-
+    
       // Subscribe to water level changes using Supabase Realtime
       const channel = supabase
         .channel("water-level-updates")
@@ -399,12 +399,19 @@
           },
           (payload) => {
             const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            console.log("New water level:", latestWaterLevel);
-
+            console.log("New water level received:", latestWaterLevel);
+    
             // Update the water level card
-            document.querySelector(".small-box.bg-info .inner h3").textContent =
-              latestWaterLevel;
-
+            const waterLevelCard = document.querySelector(
+              ".small-box.bg-info .inner h3"
+            );
+            if (waterLevelCard) {
+              waterLevelCard.textContent = latestWaterLevel;
+              console.log("Water level card updated:", latestWaterLevel);
+            } else {
+              console.error("Water level card element not found!");
+            }
+    
             // Check if water level is 3m or above
             if (latestWaterLevel >= 3) {
               if (localStorage.getItem("notificationShown") !== "true") {
@@ -421,6 +428,11 @@
           }
         )
         .subscribe();
+    
+      // Log channel subscription status
+      channel.subscribe((status) => {
+        console.log("Supabase Realtime channel status:", status);
+      });
     </script>
 
     <script>
