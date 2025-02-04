@@ -387,51 +387,68 @@
         }
       }
     
-      // Subscribe to water level changes using Supabase Realtime
-      const channel = supabase
-        .channel("water-level-updates")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT", // Listen for new inserts
-            schema: "public",
-            table: "water_levels", // Replace with your table name
-          },
-          (payload) => {
-            const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            console.log("New water level received:", latestWaterLevel);
+      // Singleton pattern for Supabase Realtime channel
+      let waterLevelChannel;
     
-            // Update the water level card
-            const waterLevelCard = document.querySelector(
-              ".small-box.bg-info .inner h3"
-            );
-            if (waterLevelCard) {
-              waterLevelCard.textContent = latestWaterLevel;
-              console.log("Water level card updated:", latestWaterLevel);
-            } else {
-              console.error("Water level card element not found!");
-            }
+      function subscribeToWaterLevelUpdates() {
+        if (waterLevelChannel) {
+          console.log("Channel already subscribed.");
+          return;
+        }
     
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-              if (localStorage.getItem("notificationShown") !== "true") {
-                showNotification(
-                  "Water Level Alert",
-                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
-                );
-                localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
+        waterLevelChannel = supabase
+          .channel("water-level-updates")
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT", // Listen for new inserts
+              schema: "public",
+              table: "water_levels", // Replace with your table name
+            },
+            (payload) => {
+              const latestWaterLevel = payload.new.water_level; // Replace with your column name
+              console.log("New water level received:", latestWaterLevel);
+    
+              // Update the water level card
+              const waterLevelCard = document.querySelector(
+                ".small-box.bg-info .inner h3"
+              );
+              if (waterLevelCard) {
+                waterLevelCard.textContent = latestWaterLevel;
+                console.log("Water level card updated:", latestWaterLevel);
+              } else {
+                console.error("Water level card element not found!");
               }
-            } else {
-              // Reset the flag if the water level drops below 3m
-              localStorage.setItem("notificationShown", "false");
-            }
-          }
-        )
-        .subscribe();
     
-      // Log channel subscription status
-      channel.subscribe((status) => {
-        console.log("Supabase Realtime channel status:", status);
+              // Check if water level is 3m or above
+              if (latestWaterLevel >= 3) {
+                if (localStorage.getItem("notificationShown") !== "true") {
+                  showNotification(
+                    "Water Level Alert",
+                    `Warning: Water level is critically high at ${latestWaterLevel}m!`
+                  );
+                  localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
+                }
+              } else {
+                // Reset the flag if the water level drops below 3m
+                localStorage.setItem("notificationShown", "false");
+              }
+            }
+          )
+          .subscribe((status) => {
+            console.log("Supabase Realtime channel status:", status);
+          });
+      }
+    
+      // Subscribe to water level updates
+      subscribeToWaterLevelUpdates();
+    
+      // Cleanup on page unload
+      window.addEventListener("beforeunload", () => {
+        if (waterLevelChannel) {
+          supabase.removeChannel(waterLevelChannel);
+          console.log("Unsubscribed from Supabase Realtime channel.");
+        }
       });
     </script>
 
