@@ -464,7 +464,6 @@
             const latestWaterLevel = data[0].water_level;
             const waterLevelCard = document.getElementById("waterLevelDisplay");
             if (waterLevelCard) {
-              waterLevelCard.textContent = latestWaterLevel.toFixed(2);
               console.log("Initial water level card updated:", latestWaterLevel);
             }
           }
