@@ -191,11 +191,10 @@
     });
 </script>
 <script type="module">
-    // Initialize Supabase client
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog'; // Replace with your Supabase API key
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Flag to track if the notification has been shown
@@ -206,12 +205,12 @@
         if (Notification.permission === "granted") {
             new Notification(title, {
                 body: message,
-                icon: "image/water-level-3-48.png" // Optional: Add an icon for the notification
+                icon: "image/water-level-3-48.png" 
             });
         }
     }
 
-    // Subscribe to water level changes using Supabase Realtime
+   
     const channel = supabase
         .channel('water-level-updates')
         .on('postgres_changes', {
