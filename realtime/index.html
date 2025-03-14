@@ -87,6 +87,20 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-lg-12">
+                        <!-- Water Level Prediction Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Water Level Prediction</h3>
+                            </div>
+                            <div class="card-body">
+                                <h2 id="predictedWaterLevel">--</h2>
+                                <p>Next predicted water level: <span id="nextPredictedLevel"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <!-- Line Chart -->
                     <div class="col-lg-6">
                         <div class="card">
@@ -308,53 +322,59 @@
 }
 
     // Subscribe to water level changes using Supabase Realtime
-    const channel = supabase
-        .channel('water-level-updates')
-        .on('postgres_changes', {
-            event: 'INSERT', // Listen for new inserts
-            schema: 'public',
-            table: 'water_levels', // Replace with your table name
-        }, (payload) => {
-            const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
-            const formattedTime = formatTime(payload.new.last_updated);
+const channel = supabase
+    .channel('water-level-updates')
+    .on('postgres_changes', {
+        event: 'INSERT', // Listen for new inserts
+        schema: 'public',
+        table: 'water_levels', // Replace with your table name
+    }, (payload) => {
+        const latestWaterLevel = payload.new.water_level; // Replace with your column name
+        const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
+        const formattedTime = formatTime(payload.new.last_updated);
 
-            // Update the current water level display
-            document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
-            document.getElementById('lastUpdated').innerText = lastUpdated;
+        // Update the current water level display
+        document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
+        document.getElementById('lastUpdated').innerText = lastUpdated;
 
-            // Update the line chart
-            const labels = lineChart.data.labels;
-            const data = lineChart.data.datasets[0].data;
+        // Update the line chart
+        const labels = lineChart.data.labels;
+        const data = lineChart.data.datasets[0].data;
 
-            // Add new data to the chart
-            labels.push(formattedTime);
-            data.push(latestWaterLevel);
+        // Add new data to the chart
+        labels.push(formattedTime);
+        data.push(latestWaterLevel);
 
-            // Keep only the last 10 data points for better visualization
-            if (labels.length > 10) {
-                labels.shift();
-                data.shift();
+        // Keep only the last 10 data points for better visualization
+        if (labels.length > 10) {
+            labels.shift();
+            data.shift();
+        }
+
+        // Update the chart
+        updateChart(labels, data);
+
+        // Update the bar chart with the latest data
+        updateBarChartData();
+
+        // Predict the next water level
+        const predictedLevel = predictNextWaterLevel(data);
+        if (predictedLevel !== null) {
+            document.getElementById('nextPredictedLevel').innerText = `${predictedLevel.toFixed(2)} m`;
+        }
+
+        // Check if water level is 3m or above
+        if (latestWaterLevel >= 3) {
+            if (!notificationShown) {
+                showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
+                notificationShown = true; // Set the flag to true to prevent duplicate notifications
             }
-
-            // Update the chart
-            updateChart(labels, data);
-
-            // Update the bar chart with the latest data
-            updateBarChartData();
-
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-                if (!notificationShown) {
-                    showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
-                    notificationShown = true; // Set the flag to true to prevent duplicate notifications
-                }
-            } else {
-                // Reset the flag if the water level drops below 3m
-                notificationShown = false;
-            }
-        })
-        .subscribe();
+        } else {
+            // Reset the flag if the water level drops below 3m
+            notificationShown = false;
+        }
+    })
+    .subscribe();
 
     // Fetch initial data to populate the charts
     async function fetchInitialData() {
@@ -392,6 +412,34 @@
         fetchInitialData();
         updateBarChartData(); // Fetch and update the bar chart data
     });
+
+
+    // Function to predict the next water level using linear regression
+function predictNextWaterLevel(data) {
+    if (data.length < 2) {
+        return null; // Not enough data to make a prediction
+    }
+
+    // Extract x (time) and y (water level) values
+    const x = data.map((_, index) => index); // Time steps (0, 1, 2, ...)
+    const y = data; // Water levels
+
+    // Calculate the slope (m) and intercept (b) for the linear regression line: y = mx + b
+    const n = x.length;
+    const sumX = x.reduce((acc, val) => acc + val, 0);
+    const sumY = y.reduce((acc, val) => acc + val, 0);
+    const sumXY = x.reduce((acc, val, index) => acc + val * y[index], 0);
+    const sumX2 = x.reduce((acc, val) => acc + val * val, 0);
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    // Predict the next value (x = n)
+    const nextX = n;
+    const nextY = slope * nextX + intercept;
+
+    return nextY;
+}
 </script>
 
 <!-- Register the service worker -->
