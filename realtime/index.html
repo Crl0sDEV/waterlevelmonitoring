@@ -408,13 +408,19 @@ const channel = supabase
     }
 
     function predictNextWaterLevel(data) {
-    if (data.length < 2) return null; // Not enough data to predict
+    if (data.length < 2) return null; // Need at least 2 data points for prediction
 
-    let lastValue = data[data.length - 1];
-    let secondLastValue = data[data.length - 2];
-    let trend = lastValue - secondLastValue; // Simple difference-based prediction
-    
-    return lastValue + trend; // Predict next value
+    // Get the last two data points
+    const lastLevel = data[data.length - 1];
+    const prevLevel = data[data.length - 2];
+
+    // Simple trend estimation: difference between last two readings
+    const trend = lastLevel - prevLevel;
+
+    // Predict next water level based on trend
+    const predictedLevel = lastLevel + trend;
+
+    return predictedLevel > 0 ? predictedLevel : 0; // Ensure no negative values
 }
 
     // Fetch initial data when the page loads
