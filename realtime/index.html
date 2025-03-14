@@ -360,7 +360,7 @@ const channel = supabase
         // Predict the next water level
         const predictedLevel = predictNextWaterLevel(data);
         if (predictedLevel !== null) {
-            document.getElementById('nextPredictedLevel').innerText = `${predictedLevel.toFixed(2)} m`;
+            document.getElementById('nextPredictedLevel').innerText = `${predictedLevel.toFixed(1)} m`;
         }
 
         // Check if water level is 3m or above
@@ -407,17 +407,10 @@ const channel = supabase
         }
     }
 
-    // Fetch initial data when the page loads
-    document.addEventListener("DOMContentLoaded", () => {
-        fetchInitialData();
-        updateBarChartData(); // Fetch and update the bar chart data
-    });
-
-
-    // Function to predict the next water level using linear regression
-function predictNextWaterLevel(data) {
+    function predictNextWaterLevel(data) {
     if (data.length < 2) {
-        return null; // Not enough data to make a prediction
+        console.log("Not enough data for prediction.");
+        return null;
     }
 
     // Extract x (time) and y (water level) values
@@ -438,8 +431,16 @@ function predictNextWaterLevel(data) {
     const nextX = n;
     const nextY = slope * nextX + intercept;
 
+    console.log("Predicted next water level:", nextY);
     return nextY;
 }
+
+    // Fetch initial data when the page loads
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchInitialData();
+        updateBarChartData(); // Fetch and update the bar chart data
+    });
+
 </script>
 
 <!-- Register the service worker -->
