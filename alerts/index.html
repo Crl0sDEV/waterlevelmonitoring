@@ -191,6 +191,7 @@
         if (error) return console.error("Error fetching data:", error);
         const tableBody = document.querySelector("table tbody");
         tableBody.innerHTML = "";
+        const filteredData = data.filter((alert) => alert.water_level >= 3);
         data.forEach(alert => {
           let status = "Normal", actionRequired = "Monitor";
           if (alert.water_level >= 3) { status = "Critical"; actionRequired = "Evacuate immediately"; }
