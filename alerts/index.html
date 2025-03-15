@@ -193,7 +193,6 @@
         tableBody.innerHTML = "";
         const filteredData = data.filter((alert) => alert.water_level >= 3);
         data.forEach(alert => {
-          let status = "Normal", actionRequired = "Monitor";
           if (alert.water_level >= 3) { status = "Critical"; actionRequired = "Evacuate immediately"; }
           const row = document.createElement("tr");
           row.innerHTML = `<td>${alert.id}</td><td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} m</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
