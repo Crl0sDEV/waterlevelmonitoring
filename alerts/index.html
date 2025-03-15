@@ -194,7 +194,6 @@
         data.forEach(alert => {
           let status = "Normal", actionRequired = "Monitor";
           if (alert.water_level >= 3) { status = "Critical"; actionRequired = "Evacuate immediately"; }
-          else if (alert.water_level > lastWaterLevel) { status = "Rising"; actionRequired = "Be prepared"; }
           const row = document.createElement("tr");
           row.innerHTML = `<td>${alert.id}</td><td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} m</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
           tableBody.appendChild(row);
