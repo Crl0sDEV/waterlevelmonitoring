@@ -230,15 +230,15 @@
     const supabaseUrl = 'https://efirubankmowqztlyuuh.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog';
     const supabase = createClient(supabaseUrl, supabaseKey);
-
+    
+    let lastWaterLevel = null;
     let notificationShown = false;
 
-    // Show browser notification
     function showNotification(title, message) {
         if (Notification.permission === "granted") {
             new Notification(title, {
                 body: message,
-                icon: "image/water-level-3-48.png" // Optional: Add an icon for the notification
+                icon: "image/water-level-3-48.png"
             });
         }
     }
@@ -255,115 +255,107 @@
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12; // Convert to 12-hour format
-        const minutesFormatted = minutes < 10 ? '0' + minutes : minutes; // Pad minutes
+        hours = hours % 12 || 12;
+        const minutesFormatted = minutes < 10 ? '0' + minutes : minutes;
         return `${hours}:${minutesFormatted} ${ampm}`;
     }
 
-    // Function to fetch and update the bar chart with the highest water level for each day
     async function updateBarChartData() {
-    try {
-        const { data, error } = await supabase
-            .from('water_levels')
-            .select('water_level, last_updated')
-            .order('last_updated', { ascending: false });
+        try {
+            const { data, error } = await supabase
+                .from('water_levels')
+                .select('water_level, last_updated')
+                .order('last_updated', { ascending: false });
 
-        if (error) {
-            console.error('Error fetching data for bar chart:', error);
-            return;
+            if (error) {
+                console.error('Error fetching data for bar chart:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                const dailyMaxLevels = {};
+                data.forEach(entry => {
+                    const date = new Date(entry.last_updated).toLocaleDateString();
+                    if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
+                        dailyMaxLevels[date] = entry.water_level;
+                    }
+                });
+
+                const labels = Object.keys(dailyMaxLevels);
+                const waterLevels = Object.values(dailyMaxLevels);
+
+                const sortedData = labels
+                    .map((label, index) => ({
+                        date: new Date(label),
+                        level: waterLevels[index],
+                    }))
+                    .sort((a, b) => a.date - b.date);
+
+                const sortedLabels = sortedData.map(entry => entry.date.toLocaleDateString());
+                const sortedWaterLevels = sortedData.map(entry => entry.level);
+
+                updateBarChart(sortedLabels, sortedWaterLevels);
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err);
         }
-
-        if (data && data.length > 0) {
-            // Group data by day and find the highest water level for each day
-            const dailyMaxLevels = {};
-            data.forEach(entry => {
-                const date = new Date(entry.last_updated).toLocaleDateString();
-                if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
-                    dailyMaxLevels[date] = entry.water_level;
-                }
-            });
-
-            // Convert the grouped data into arrays for labels and water levels
-            const labels = Object.keys(dailyMaxLevels);
-            const waterLevels = Object.values(dailyMaxLevels);
-
-            // Sort the labels and water levels by date in ascending order
-            const sortedData = labels
-                .map((label, index) => ({
-                    date: new Date(label), // Convert label to Date object for sorting
-                    level: waterLevels[index],
-                }))
-                .sort((a, b) => a.date - b.date); // Sort by date in ascending order
-
-            // Extract sorted labels and water levels
-            const sortedLabels = sortedData.map(entry => entry.date.toLocaleDateString());
-            const sortedWaterLevels = sortedData.map(entry => entry.level);
-
-            // Update the bar chart with sorted data
-            updateBarChart(sortedLabels, sortedWaterLevels);
-        }
-    } catch (err) {
-        console.error('Unexpected error:', err);
     }
-}
 
-    // Subscribe to water level changes using Supabase Realtime
     const channel = supabase
         .channel('water-level-updates')
         .on('postgres_changes', {
-            event: 'INSERT', // Listen for new inserts
+            event: 'INSERT',
             schema: 'public',
-            table: 'water_levels', // Replace with your table name
+            table: 'water_levels',
         }, (payload) => {
-            const latestWaterLevel = payload.new.water_level; // Replace with your column name
+            const latestWaterLevel = payload.new.water_level;
             const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
             const formattedTime = formatTime(payload.new.last_updated);
 
-            // Update the current water level display
             document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
             document.getElementById('lastUpdated').innerText = lastUpdated;
 
-            // Update the line chart
             const labels = lineChart.data.labels;
             const data = lineChart.data.datasets[0].data;
 
-            // Add new data to the chart
             labels.push(formattedTime);
             data.push(latestWaterLevel);
 
-            // Keep only the last 10 data points for better visualization
             if (labels.length > 10) {
                 labels.shift();
                 data.shift();
             }
 
-            // Update the chart
             updateChart(labels, data);
-
-            // Update the bar chart with the latest data
             updateBarChartData();
 
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-                if (!notificationShown) {
-                    showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
-                    notificationShown = true; // Set the flag to true to prevent duplicate notifications
+            // **Early Warning System**
+            if (lastWaterLevel !== null) {
+                const rise = latestWaterLevel - lastWaterLevel;
+
+                if (rise >= 0.5) {
+                    showNotification("Early Warning", `Alert: Water level is rising rapidly by ${rise.toFixed(2)}m!`);
                 }
-            } else {
-                // Reset the flag if the water level drops below 3m
-                notificationShown = false;
+
+                if (latestWaterLevel >= 3 && !notificationShown) {
+                    showNotification("Water Level Alert", `Warning: Water level is critically high at ${latestWaterLevel}m!`);
+                    notificationShown = true;
+                } else if (latestWaterLevel < 3) {
+                    notificationShown = false;
+                }
             }
+
+            lastWaterLevel = latestWaterLevel;
         })
         .subscribe();
 
-    // Fetch initial data to populate the charts
     async function fetchInitialData() {
         try {
             const { data, error } = await supabase
                 .from('water_levels')
                 .select('*')
                 .order('last_updated', { ascending: false })
-                .limit(5); // Fetch the last 5 records
+                .limit(5);
 
             if (error) {
                 console.error('Error fetching initial data:', error);
@@ -374,24 +366,24 @@
                 const labels = data.map(entry => new Date(entry.last_updated).toLocaleString()).reverse();
                 const waterLevels = data.map(entry => entry.water_level).reverse();
 
-                // Update the line chart with initial data
                 updateChart(labels, waterLevels);
 
-                // Update the current water level display
                 const latest = data[0];
                 document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
                 document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
+
+                lastWaterLevel = latest.water_level;
             }
         } catch (err) {
             console.error('Unexpected error:', err);
         }
     }
 
-    // Fetch initial data when the page loads
     document.addEventListener("DOMContentLoaded", () => {
         fetchInitialData();
-        updateBarChartData(); // Fetch and update the bar chart data
+        updateBarChartData();
     });
+
 </script>
 
 <!-- Register the service worker -->

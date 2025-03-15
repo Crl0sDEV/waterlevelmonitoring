@@ -166,91 +166,41 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog";
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // Flag to track if the notification has been shown
+      let lastWaterLevel = null;
       let notificationShown = false;
-
-      // Show browser notification
       function showNotification(title, message) {
         if (Notification.permission === "granted") {
-          new Notification(title, {
-            body: message,
-            icon: "image/water-level-3-48.png",
-          });
+          new Notification(title, { body: message, icon: "image/water-level-3-48.png" });
         }
       }
-
-      const channel = supabase
-        .channel("water-level-updates")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT", // Listen for new inserts
-            schema: "public",
-            table: "water_levels", // Replace with your table name
-          },
-          (payload) => {
-            const latestWaterLevel = payload.new.water_level; // Replace with your column name
-            console.log("New water level:", latestWaterLevel);
-
-            // Check if water level is 3m or above
-            if (latestWaterLevel >= 3) {
-              if (!notificationShown) {
-                showNotification(
-                  "Water Level Alert",
-                  `Warning: Water level is critically high at ${latestWaterLevel}m!`
-                );
-                notificationShown = true; // Set the flag to true to prevent duplicate notifications
-              }
-            } else {
-              // Reset the flag if the water level drops below 3m
-              notificationShown = false;
-            }
-          }
-        )
-        .subscribe();
-
+      const channel = supabase.channel("water-level-updates").on("postgres_changes", { event: "INSERT", schema: "public", table: "water_levels" }, (payload) => {
+        const latestWaterLevel = payload.new.water_level;
+        if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
+          showNotification("Early Warning", `Water level is rising: ${latestWaterLevel}m!`);
+        }
+        if (latestWaterLevel >= 3 && !notificationShown) {
+          showNotification("Critical Alert", `Water level critically high at ${latestWaterLevel}m!`);
+          notificationShown = true;
+        } else if (latestWaterLevel < 3) {
+          notificationShown = false;
+        }
+        lastWaterLevel = latestWaterLevel;
+      }).subscribe();
       async function fetchAlerts() {
-        try {
-          const { data, error } = await supabase
-            .from("water_levels")
-            .select("id, water_level, last_updated")
-            .order("last_updated", { ascending: false }); // Order by last_updated in descending order
-
-          if (error) {
-            console.error("Error fetching data:", error);
-            return;
-          }
-
-          const tableBody = document.querySelector("table tbody");
-          tableBody.innerHTML = "";
-
-          // Filter data to show only water levels ≥ 3m
-          const filteredData = data.filter((alert) => alert.water_level >= 3);
-
-          filteredData.forEach((alert) => {
-            let status, actionRequired;
-            if (alert.water_level >= 3) {
-              status = "Critical";
-              actionRequired = "Evacuate immediately";
-            }
-
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${alert.id}</td>
-                <td>${new Date(alert.last_updated).toLocaleString()}</td>
-                <td>${alert.water_level} m</td>
-                <td class="status-${status.toLowerCase()}">${status}</td>
-                <td>${actionRequired}</td>
-            `;
-            tableBody.appendChild(row);
-          });
-        } catch (err) {
-          console.error("Unexpected error:", err);
-        }
+        const { data, error } = await supabase.from("water_levels").select("id, water_level, last_updated").order("last_updated", { ascending: false });
+        if (error) return console.error("Error fetching data:", error);
+        const tableBody = document.querySelector("table tbody");
+        tableBody.innerHTML = "";
+        data.forEach(alert => {
+          let status = "Normal", actionRequired = "Monitor";
+          if (alert.water_level >= 3) { status = "Critical"; actionRequired = "Evacuate immediately"; }
+          else if (alert.water_level > lastWaterLevel) { status = "Rising"; actionRequired = "Be prepared"; }
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${alert.id}</td><td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} m</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
+          tableBody.appendChild(row);
+        });
       }
-
       document.addEventListener("DOMContentLoaded", fetchAlerts);
-
       setInterval(fetchAlerts, 10000);
     </script>
 
