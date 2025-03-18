@@ -125,6 +125,7 @@
                 <div class="small-box bg-info">
                   <div class="inner">
                     <h3 id="waterLevelDisplay">0</h3>
+                    <p>Water Level (m)</p>
                     <!-- Add a warning message element -->
                     <p id="waterLevelWarning" class="warning-text"></p>
                   </div>
@@ -426,26 +427,8 @@
           console.error("Water level card element not found!");
         }
 
-        // Get the displayed water level value from the h3 element
-        const displayedWaterLevel = parseFloat(waterLevelCard.textContent);
-
-        // Update the warning message based on the displayed water level
-        const warningElement = document.getElementById("waterLevelWarning");
-        if (warningElement) {
-          if (displayedWaterLevel > 15) {
-            warningElement.textContent = "Critical: Evacuate immediately.";
-            warningElement.style.color = "red";
-          } else if (displayedWaterLevel > 6 && displayedWaterLevel <= 15) {
-            warningElement.textContent = "High: Prepare for possible evacuation.";
-            warningElement.style.color = "orange";
-          } else if (displayedWaterLevel <= 6) {
-            warningElement.textContent = "Moderate: Monitor closely.";
-            warningElement.style.color = "gold";
-          }
-          console.log("Warning text updated:", warningElement.textContent);
-        } else {
-          console.error("Warning element not found!");
-        }
+        // Update the warning message based on the latest water level
+        updateWarningMessage(latestWaterLevel);
 
         // Check if water level is rising or greater than the last detected level
         if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
@@ -499,32 +482,55 @@ subscribeToWaterLevelUpdates();
 
       // Fetch the latest water level when the page loads
       async function fetchLatestWaterLevel() {
-        try {
-          const { data, error } = await supabase
-            .from("water_levels")
-            .select("water_level")
-            .order("last_updated", { ascending: false })
-            .limit(1);
+  try {
+    const { data, error } = await supabase
+      .from("water_levels")
+      .select("water_level")
+      .order("last_updated", { ascending: false })
+      .limit(1);
 
-          if (error) {
-            console.error("Error fetching latest water level:", error);
-            return;
-          }
+    if (error) {
+      console.error("Error fetching latest water level:", error);
+      return;
+    }
 
-          if (data && data.length > 0) {
-            const latestWaterLevel = data[0].water_level;
-            const waterLevelCard = document.getElementById("waterLevelDisplay");
-            if (waterLevelCard) {
-              waterLevelCard.textContent = latestWaterLevel;
-              console.log("Initial water level card updated:", latestWaterLevel);
-            }
-            // Set the last water level
-            lastWaterLevel = latestWaterLevel;
-          }
-        } catch (err) {
-          console.error("Error:", err);
-        }
+    if (data && data.length > 0) {
+      const latestWaterLevel = data[0].water_level;
+      const waterLevelCard = document.getElementById("waterLevelDisplay");
+      if (waterLevelCard) {
+        waterLevelCard.textContent = latestWaterLevel.toFixed(2);
+        console.log("Initial water level card updated:", latestWaterLevel);
+
+        // Update the warning message based on the fetched water level
+        updateWarningMessage(latestWaterLevel);
       }
+      // Set the last water level
+      lastWaterLevel = latestWaterLevel;
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+}
+
+// Function to update the warning message based on the water level
+function updateWarningMessage(waterLevel) {
+  const warningElement = document.getElementById("waterLevelWarning");
+  if (warningElement) {
+    if (waterLevel > 15) {
+      warningElement.textContent = "Critical: Evacuate immediately.";
+      warningElement.style.color = "red";
+    } else if (waterLevel > 6 && waterLevel <= 15) {
+      warningElement.textContent = "High: Prepare for possible evacuation.";
+      warningElement.style.color = "orange";
+    } else if (waterLevel <= 6) {
+      warningElement.textContent = "Moderate: Monitor closely.";
+      warningElement.style.color = "gold";
+    }
+    console.log("Warning text updated:", warningElement.textContent);
+  } else {
+    console.error("Warning element not found!");
+  }
+}
 
       async function fetchHighWaterLevelCount() {
         try {
