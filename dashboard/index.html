@@ -36,6 +36,21 @@
       .warning-text {
   font-weight: bold;
   margin-top: 10px;
+  padding: 5px 10px; /* Add padding for better spacing */
+  border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+/* Add background colors based on the status */
+.warning-text.critical {
+  background-color: #ffcccc; /* Light red for critical */
+}
+
+.warning-text.high {
+  background-color: #ffebcc; /* Light orange for high */
+}
+
+.warning-text.moderate {
+  background-color: #ffffcc; /* Light yellow for moderate */
 }
     </style>
   </head>
@@ -511,19 +526,21 @@ subscribeToWaterLevelUpdates();
   }
 }
 
-// Function to update the warning message based on the water level
 function updateWarningMessage(waterLevel) {
   const warningElement = document.getElementById("waterLevelWarning");
   if (warningElement) {
+    // Remove existing classes
+    warningElement.classList.remove("critical", "high", "moderate");
+
     if (waterLevel > 15) {
       warningElement.textContent = "Status: Critical";
-      warningElement.style.color = "red";
+      warningElement.classList.add("critical");
     } else if (waterLevel > 6 && waterLevel <= 15) {
       warningElement.textContent = "Status: High";
-      warningElement.style.color = "orange";
+      warningElement.classList.add("high");
     } else if (waterLevel <= 6) {
       warningElement.textContent = "Status: Moderate";
-      warningElement.style.color = "gold";
+      warningElement.classList.add("moderate");
     }
     console.log("Warning text updated:", warningElement.textContent);
   } else {
