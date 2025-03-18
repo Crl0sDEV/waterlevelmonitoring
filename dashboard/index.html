@@ -36,7 +36,6 @@
       .warning-text {
   font-weight: bold;
   margin-top: 10px;
-  z-index: 1;
 }
     </style>
   </head>
@@ -428,19 +427,23 @@
           console.error("Water level card element not found!");
         }
 
-        // Update the warning message based on the water level
+        // Get the displayed water level value from the h3 element
+        const displayedWaterLevel = parseFloat(waterLevelCard.textContent);
+
+        // Update the warning message based on the displayed water level
         const warningElement = document.getElementById("waterLevelWarning");
         if (warningElement) {
-          if (latestWaterLevel > 15) {
+          if (displayedWaterLevel > 15) {
             warningElement.textContent = "Critical: Evacuate immediately.";
             warningElement.style.color = "red";
-          } else if (latestWaterLevel > 6 && latestWaterLevel <= 15) {
+          } else if (displayedWaterLevel > 6 && displayedWaterLevel <= 15) {
             warningElement.textContent = "High: Prepare for possible evacuation.";
             warningElement.style.color = "orange";
-          } else if (latestWaterLevel <= 6) {
+          } else if (displayedWaterLevel <= 6) {
             warningElement.textContent = "Moderate: Monitor closely.";
             warningElement.style.color = "gold";
           }
+          console.log("Warning text updated:", warningElement.textContent);
         } else {
           console.error("Warning element not found!");
         }
@@ -484,8 +487,8 @@
     });
 }
 
-      // Subscribe to water level updates
-      subscribeToWaterLevelUpdates();
+// Ensure the function is called when the page loads
+subscribeToWaterLevelUpdates();
 
       // Cleanup on page unload
       window.addEventListener("beforeunload", () => {
