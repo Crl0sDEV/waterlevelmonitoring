@@ -125,9 +125,8 @@
                 <div class="small-box bg-info">
                   <div class="inner">
                     <h3 id="waterLevelDisplay">0</h3>
-                    <p>Water Level (m)</p>
-                    <!-- Add a warning message element -->
-                    <p id="waterLevelWarning" class="warning-text"></p>
+                    <!-- Add a warning message element with "Status:" prefix -->
+                    <p id="waterLevelWarning" class="warning-text">Status: </p>
                   </div>
                   <div class="icon">
                     <i class="fas fa-water"></i>
@@ -517,13 +516,13 @@ function updateWarningMessage(waterLevel) {
   const warningElement = document.getElementById("waterLevelWarning");
   if (warningElement) {
     if (waterLevel > 15) {
-      warningElement.textContent = "Critical: Evacuate immediately.";
+      warningElement.textContent = "Status: Critical";
       warningElement.style.color = "red";
     } else if (waterLevel > 6 && waterLevel <= 15) {
-      warningElement.textContent = "High: Prepare for possible evacuation.";
+      warningElement.textContent = "Status: High";
       warningElement.style.color = "orange";
     } else if (waterLevel <= 6) {
-      warningElement.textContent = "Moderate: Monitor closely.";
+      warningElement.textContent = "Status: Moderate";
       warningElement.style.color = "gold";
     }
     console.log("Warning text updated:", warningElement.textContent);
