@@ -137,7 +137,7 @@
         data: {
             labels: [], // Will be populated dynamically
             datasets: [{
-                label: 'Water Level (m)',
+                label: 'Water Level (cm)',
                 data: [], // Will be populated dynamically
                 borderColor: 'blue',
                 tension: 0.4,
@@ -157,7 +157,7 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Water Level (m)',
+                        text: 'Water Level (cm)',
                     },
                 },
                 x: {
@@ -177,7 +177,7 @@
         data: {
             labels: [], // Will be populated dynamically
             datasets: [{
-                label: 'Highest Water Level (m)',
+                label: 'Highest Water Level (cm)',
                 data: [], // Will be populated dynamically
                 backgroundColor: 'lightblue'
             }]
@@ -195,7 +195,7 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Water Level (m)',
+                        text: 'Water Level (cm)',
                     },
                 },
                 x: {
@@ -230,7 +230,7 @@
     const supabaseUrl = 'https://efirubankmowqztlyuuh.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog';
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
+
     let lastWaterLevel = null;
     let notificationShown = false;
 
@@ -312,7 +312,7 @@
             const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
             const formattedTime = formatTime(payload.new.last_updated);
 
-            document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
+            document.getElementById('waterLevel').innerText = `${latestWaterLevel} cm`;
             document.getElementById('lastUpdated').innerText = lastUpdated;
 
             const labels = lineChart.data.labels;
