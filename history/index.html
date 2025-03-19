@@ -224,8 +224,8 @@
         tableBody.innerHTML = "";
         data.forEach(alert => {
           let status = "Normal", actionRequired = "Monitor";
-          if (alert.water_level >= 3) { status = "Critical"; actionRequired = "Evacuate immediately"; }
-          else if (alert.water_level >= 2) {
+          if (alert.water_level >= 15) { status = "Critical"; actionRequired = "Evacuate immediately"; }
+          else if (alert.water_level >= 6) {
                 status = 'High';
                 actionRequired = 'Prepare for possible evacuation';
             } else {
