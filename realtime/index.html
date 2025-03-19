@@ -369,7 +369,7 @@
                 updateChart(labels, waterLevels);
 
                 const latest = data[0];
-                document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
+                document.getElementById('waterLevel').innerText = `${latest.water_level} cm`;
                 document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
 
                 lastWaterLevel = latest.water_level;

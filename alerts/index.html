@@ -109,7 +109,7 @@
                 <!-- Alerts Table -->
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Recent Alerts (Water Level ≥ 3m)</h3>
+                    <h3 class="card-title">Recent Alerts (Water Level ≥ 15cm)</h3>
                   </div>
                   <div class="card-body">
                     <div class="table-container">
@@ -193,7 +193,7 @@
           const { data, error } = await supabase
             .from("water_levels")
             .select("id, water_level, last_updated")
-            .gte("water_level", 3) // Filter for water levels ≥ 3m
+            .gte("water_level", 15) // Filter for water levels ≥ 3m
             .order("last_updated", { ascending: false });
 
           if (error) {
@@ -217,7 +217,7 @@
             row.innerHTML = `
               <td>${alert.id}</td>
               <td>${new Date(alert.last_updated).toLocaleString()}</td>
-              <td>${alert.water_level} m</td>
+              <td>${alert.water_level} cm</td>
               <td class="status-critical">${status}</td>
               <td>${actionRequired}</td>
             `;
