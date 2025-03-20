@@ -414,9 +414,10 @@
       }
 
       // Singleton pattern for Supabase Realtime channel
-      let waterLevelChannel;
+      // Singleton pattern for Supabase Realtime channel
+let waterLevelChannel;
 
-      function subscribeToWaterLevelUpdates() {
+function subscribeToWaterLevelUpdates() {
     if (waterLevelChannel) {
         console.log("Channel already subscribed.");
         return;
@@ -488,77 +489,67 @@
             console.log("Supabase Realtime channel status:", status);
         });
 }
-      // Subscribe to water level updates
-      subscribeToWaterLevelUpdates();
 
-      // Cleanup on page unload
-      window.addEventListener("beforeunload", () => {
-        if (waterLevelChannel) {
-          supabase.removeChannel(waterLevelChannel);
-          console.log("Unsubscribed from Supabase Realtime channel.");
+// Fetch the latest water level when the page loads
+async function fetchLatestWaterLevel() {
+    try {
+        const { data, error } = await supabase
+            .from("water_levels")
+            .select("water_level")
+            .order("last_updated", { ascending: false })
+            .limit(1);
+
+        if (error) {
+            console.error("Error fetching latest water level:", error);
+            return;
         }
-      });
 
-      // Fetch the latest water level when the page loads
-      async function fetchLatestWaterLevel() {
-  try {
-    const { data, error } = await supabase
-      .from("water_levels")
-      .select("water_level")
-      .order("last_updated", { ascending: false })
-      .limit(1);
+        if (data && data.length > 0) {
+            const latestWaterLevel = data[0].water_level;
+            const waterLevelCard = document.getElementById("waterLevelDisplay");
+            if (waterLevelCard) {
+                waterLevelCard.textContent = latestWaterLevel.toFixed(1);
+                console.log("Initial water level card updated:", latestWaterLevel);
 
-    if (error) {
-      console.error("Error fetching latest water level:", error);
-      return;
+                // Update the warning message based on the fetched water level
+                updateWarningMessage(latestWaterLevel);
+            }
+            // Set the last water level
+            lastWaterLevel = latestWaterLevel;
+        }
+    } catch (err) {
+        console.error("Error:", err);
     }
-
-    if (data && data.length > 0) {
-      const latestWaterLevel = data[0].water_level;
-      const waterLevelCard = document.getElementById("waterLevelDisplay");
-      if (waterLevelCard) {
-        waterLevelCard.textContent = latestWaterLevel.toFixed(1);
-        console.log("Initial water level card updated:", latestWaterLevel);
-
-        // Update the warning message based on the fetched water level
-        updateWarningMessage(latestWaterLevel);
-      }
-      // Set the last water level
-      lastWaterLevel = latestWaterLevel;
-    }
-  } catch (err) {
-    console.error("Error:", err);
-  }
 }
 
 function updateWarningMessage(waterLevel) {
-  const warningElement = document.getElementById("waterLevelWarning");
-  if (warningElement) {
-    // Remove existing classes
-    warningElement.classList.remove("critical", "high", "moderate");
+    const warningElement = document.getElementById("waterLevelWarning");
+    if (warningElement) {
+        // Remove existing classes
+        warningElement.classList.remove("critical", "high", "moderate");
 
-    if (waterLevel >= 15) {
-      warningElement.textContent = "Status: Critical";
-      warningElement.classList.add("critical");
-    } else if (waterLevel >= 6 && waterLevel < 15) {
-      warningElement.textContent = "Status: High";
-      warningElement.classList.add("high");
-    } else if (waterLevel < 6) {
-      warningElement.textContent = "Status: Moderate";
-      warningElement.classList.add("moderate");
+        if (waterLevel >= 15) {
+            warningElement.textContent = "Status: Critical";
+            warningElement.classList.add("critical");
+        } else if (waterLevel >= 6 && waterLevel < 15) {
+            warningElement.textContent = "Status: High";
+            warningElement.classList.add("high");
+        } else if (waterLevel < 6) {
+            warningElement.textContent = "Status: Moderate";
+            warningElement.classList.add("moderate");
+        }
+        console.log("Warning text updated:", warningElement.textContent);
+    } else {
+        console.error("Warning element not found!");
     }
-    console.log("Warning text updated:", warningElement.textContent);
-  } else {
-    console.error("Warning element not found!");
-  }
 }
 
-      async function fetchHighWaterLevelCount() {
+async function fetchHighWaterLevelCount() {
         try {
           const { count, error } = await supabase
             .from("water_levels")
             .select("*", { count: "exact", head: true })
-            .gte("water_level", 3);
+            .gte("water_level", 15);
 
           if (error) {
             console.error("Error fetching high water level count:", error);
@@ -577,8 +568,19 @@ function updateWarningMessage(waterLevel) {
         }
       }
 
-      fetchLatestWaterLevel();
-      fetchHighWaterLevelCount();
+// Subscribe to water level updates
+subscribeToWaterLevelUpdates();
+
+// Cleanup on page unload
+window.addEventListener("beforeunload", () => {
+    if (waterLevelChannel) {
+        supabase.removeChannel(waterLevelChannel);
+        console.log("Unsubscribed from Supabase Realtime channel.");
+    }
+});
+
+fetchLatestWaterLevel();
+fetchHighWaterLevelCount();
 
       async function fetchWaterLevelCount() {
         try {
