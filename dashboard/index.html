@@ -417,72 +417,77 @@
       let waterLevelChannel;
 
       function subscribeToWaterLevelUpdates() {
-        if (waterLevelChannel) {
-          console.log("Channel already subscribed.");
-          return;
-        }
+    if (waterLevelChannel) {
+        console.log("Channel already subscribed.");
+        return;
+    }
 
-        waterLevelChannel = supabase
-          .channel("water-level-updates")
-          .on(
+    waterLevelChannel = supabase
+        .channel("water-level-updates")
+        .on(
             "postgres_changes",
             {
-              event: "INSERT", // Listen for new inserts
-              schema: "public",
-              table: "water_levels", // Replace with your table name
+                event: "INSERT", // Listen for new inserts
+                schema: "public",
+                table: "water_levels", // Replace with your table name
             },
             (payload) => {
-              const latestWaterLevel = payload.new.water_level; // Replace with your column name
-              console.log("New water level received:", latestWaterLevel);
+                const latestWaterLevel = payload.new.water_level; // Replace with your column name
+                console.log("New water level received:", latestWaterLevel);
 
-              // Update the water level card
-              const waterLevelCard = document.getElementById("waterLevelDisplay");
-              if (waterLevelCard) {
-                waterLevelCard.textContent = latestWaterLevel.toFixed(2);
-                console.log("Water level card updated:", latestWaterLevel);
-              } else {
-                console.error("Water level card element not found!");
-              }
-
-              // Check if water level is rising or greater than the last detected level
-              if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
-                showNotification(
-                  "Early Warning: Water Level Rising",
-                  `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
-                );
-              }
-
-              // Check if water level is 3m or above
-              if (latestWaterLevel >= 15) {
-                if (localStorage.getItem("notificationShown") !== "true") {
-                  showNotification(
-                    "Water Level Alert",
-                    `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
-                  );
-                  localStorage.setItem("notificationShown", "true"); // Set the flag in localStorage
+                // Update the water level card
+                const waterLevelCard = document.getElementById("waterLevelDisplay");
+                if (waterLevelCard) {
+                    waterLevelCard.textContent = latestWaterLevel.toFixed(2);
+                    console.log("Water level card updated:", latestWaterLevel);
+                } else {
+                    console.error("Water level card element not found!");
                 }
-                // Update the alerts count
-                fetchHighWaterLevelCount();
-              } else {
-                // Reset the flag if the water level drops below 3m
-                localStorage.setItem("notificationShown", "false");
-              }
 
-              // Update the last water level
-              lastWaterLevel = latestWaterLevel;
+                // Check if water level is rising
+                if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
+                    // Early Warning: Trigger only if the water level is rising and below 15
+                    if (latestWaterLevel < 15) {
+                        showNotification(
+                            "Early Warning: Water Level Rising",
+                            `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
+                        );
+                    }
+                }
 
-              // Update the chart with the new data point
-              const currentDate = new Date().toLocaleDateString();
-              waterLevelChart.data.labels.push(currentDate);
-              waterLevelChart.data.datasets[0].data.push(latestWaterLevel);
-              waterLevelChart.update();
+                // Check if water level is 15 or above
+                if (latestWaterLevel >= 15) {
+                    if (localStorage.getItem("warningNotificationShown") !== "true") {
+                        showNotification(
+                            "Water Level Alert",
+                            `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
+                        );
+                        localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
+                    }
+                    // Update the alerts count
+                    fetchHighWaterLevelCount();
+                } else {
+                    // Reset the flag if the water level drops below 15
+                    localStorage.setItem("warningNotificationShown", "false");
+                }
+
+                // Update the last water level
+                lastWaterLevel = latestWaterLevel;
+
+                // Update the chart with the new data point
+                const currentDate = new Date().toLocaleDateString();
+                waterLevelChart.data.labels.push(currentDate);
+                waterLevelChart.data.datasets[0].data.push(latestWaterLevel);
+                waterLevelChart.update();
+
+                // Update the warning message
+                updateWarningMessage(latestWaterLevel);
             }
-          )
-          .subscribe((status) => {
+        )
+        .subscribe((status) => {
             console.log("Supabase Realtime channel status:", status);
-          });
-      }
-
+        });
+}
       // Subscribe to water level updates
       subscribeToWaterLevelUpdates();
 
