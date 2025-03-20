@@ -540,7 +540,7 @@ function updateWarningMessage(waterLevel) {
     if (waterLevel > 15) {
       warningElement.textContent = "Status: Critical";
       warningElement.classList.add("critical");
-    } else if (waterLevel > 6 && waterLevel <= 15) {
+    } else if (waterLevel > 6 && waterLevel <= 14) {
       warningElement.textContent = "Status: High";
       warningElement.classList.add("high");
     } else if (waterLevel <= 6) {
