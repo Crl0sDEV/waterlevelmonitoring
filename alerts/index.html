@@ -167,49 +167,76 @@
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
       let lastWaterLevel = null;
-      let notificationShown = false;
-      
+
+      // Request notification permission
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted.");
+          }
+        });
+      }
+
+      // Show browser notification
       function showNotification(title, message) {
         if (Notification.permission === "granted") {
-          new Notification(title, { body: message, icon: "image/water-level-3-48.png" });
+          new Notification(title, {
+            body: message,
+            icon: "image/water-level-3-48.png",
+          });
         }
       }
-      const channel = supabase.channel("water-level-updates").on("postgres_changes", { event: "INSERT", schema: "public", table: "water_levels" }, (payload) => {
-        const latestWaterLevel = payload.new.water_level;
-        // **Early Warning System**
-        if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
-                // Early Warning: Trigger only if the water level is rising and below 15
-                if (latestWaterLevel < 15) {
-                    showNotification(
-                        "Early Warning: Water Level Rising",
-                        `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
-                    );
-                }
+
+      const channel = supabase
+        .channel("water-level-updates")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "water_levels",
+          },
+          (payload) => {
+            const latestWaterLevel = payload.new.water_level;
+
+            // **Early Warning System**
+            if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
+              // Early Warning: Trigger only if the water level is rising and below 15
+              if (latestWaterLevel < 15) {
+                showNotification(
+                  "Early Warning: Water Level Rising",
+                  `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
+                );
+              }
             }
 
             // **Warning Alert System**
             if (latestWaterLevel >= 15) {
-                if (localStorage.getItem("warningNotificationShown") !== "true") {
-                    showNotification(
-                        "Water Level Alert",
-                        `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
-                    );
-                    localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
-                }
+              if (localStorage.getItem("warningNotificationShown") !== "true") {
+                showNotification(
+                  "Water Level Alert",
+                  `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
+                );
+                localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
+              }
             } else {
-                // Reset the flag if the water level drops below 15
-                localStorage.setItem("warningNotificationShown", "false");
+              // Reset the flag if the water level drops below 15
+              localStorage.setItem("warningNotificationShown", "false");
             }
+
             // Update the last water level
             lastWaterLevel = latestWaterLevel;
-      }).subscribe();
+          }
+        )
+        .subscribe();
+
       async function fetchAlerts() {
         try {
           // Fetch data from Supabase
           const { data, error } = await supabase
             .from("water_levels")
             .select("id, water_level, last_updated")
-            .gte("water_level", 15) // Filter for water levels ≥ 3m
+            .gte("water_level", 15) // Filter for water levels ≥ 15cm
             .order("last_updated", { ascending: false });
 
           if (error) {
