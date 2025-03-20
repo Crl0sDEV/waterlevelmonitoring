@@ -582,25 +582,39 @@ window.addEventListener("beforeunload", () => {
 fetchLatestWaterLevel();
 fetchHighWaterLevelCount();
 
-      async function fetchWaterLevelCount() {
-        try {
-          const { data, error } = await supabase.from("water_levels").select("*", { count: "exact" });
+      // Fetch the total count of water level records
+async function fetchWaterLevelCount() {
+  try {
+    const { count, error } = await supabase
+      .from("water_levels") // Replace with your table name
+      .select("*", { count: "exact", head: true }); // Fetch only the count
+    if (error) {
+      console.error("Error fetching water level count:", error.message);
+      return;
+    }
+    // Update the count in the History Records card
+    const historyCard = document.querySelector(".col-lg-3.col-6 .bg-success h3");
+    if (historyCard) {
+      historyCard.textContent = count || 0; // Display count or 0 if no records exist
+      console.log("History Records card updated:", count);
+    } else {
+      console.error("History Records card element not found!");
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+}
 
-          if (error) {
-            console.error("Error fetching water level count:", error.message);
-            return;
-          }
+// Periodically update the History Records card
+function startPeriodicUpdates() {
+  fetchWaterLevelCount(); // Initial fetch
+  setInterval(fetchWaterLevelCount, 10000); // Update every 10 seconds
+}
 
-          // Update the count in the History Records card
-          const waterLevelCount = data.length;
-          document.querySelector(".col-lg-3.col-6 .bg-success h3").textContent = waterLevelCount || 0;
-        } catch (err) {
-          console.error("Unexpected error:", err);
-        }
-      }
-
-      // Fetch water level count on page load
-      document.addEventListener("DOMContentLoaded", fetchWaterLevelCount);
+// Start periodic updates when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  startPeriodicUpdates();
+});
     </script>
 
     <script>
