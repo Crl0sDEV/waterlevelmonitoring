@@ -324,7 +324,6 @@
 
     document.addEventListener('DOMContentLoaded', fetchAlerts);
 
-    setInterval(fetchAlerts, 1000);
 </script>
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -369,6 +368,8 @@
             // Update the last water level
             lastWaterLevel = latestWaterLevel;
       }).subscribe();
+
+      setInterval(fetchAlerts, 1000);
 </script>
 
 <!-- Register the service worker -->
