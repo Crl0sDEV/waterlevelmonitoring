@@ -287,6 +287,44 @@
             fetchAlerts(selectedMonth);
         });
     });
+    async function fetchAlerts(month = "all") {
+        const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
+        if (error) return console.error("Error fetching data:", error);
+        const tableBody = document.querySelector("table tbody");
+        tableBody.innerHTML = "";
+        data.forEach(alert => {
+            const alertDate = new Date(alert.last_updated);
+            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0"); // Get month in "MM" format
+
+            // Filter by month
+            if (month === "all" || alertMonth === month) {
+                let status = "Normal", actionRequired = "Monitor";
+                if (alert.water_level >= 15) {
+                    status = "Critical";
+                    actionRequired = "Evacuate immediately";
+                } else if (alert.water_level >= 6) {
+                    status = "High";
+                    actionRequired = "Prepare for possible evacuation";
+                } else {
+                    status = "Moderate";
+                    actionRequired = "Monitor closely";
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${alertDate.toLocaleString()}</td>
+                    <td>${alert.water_level} cm</td>
+                    <td class="status-${status.toLowerCase()}">${status}</td>
+                    <td>${actionRequired}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchAlerts);
+
+    setInterval(fetchAlerts, 1000);
 </script>
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -331,44 +369,6 @@
             // Update the last water level
             lastWaterLevel = latestWaterLevel;
       }).subscribe();
-      async function fetchAlerts(month = "all") {
-        const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
-        if (error) return console.error("Error fetching data:", error);
-        const tableBody = document.querySelector("table tbody");
-        tableBody.innerHTML = "";
-        data.forEach(alert => {
-            const alertDate = new Date(alert.last_updated);
-            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0"); // Get month in "MM" format
-
-            // Filter by month
-            if (month === "all" || alertMonth === month) {
-                let status = "Normal", actionRequired = "Monitor";
-                if (alert.water_level >= 15) {
-                    status = "Critical";
-                    actionRequired = "Evacuate immediately";
-                } else if (alert.water_level >= 6) {
-                    status = "High";
-                    actionRequired = "Prepare for possible evacuation";
-                } else {
-                    status = "Moderate";
-                    actionRequired = "Monitor closely";
-                }
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${alertDate.toLocaleString()}</td>
-                    <td>${alert.water_level} cm</td>
-                    <td class="status-${status.toLowerCase()}">${status}</td>
-                    <td>${actionRequired}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', fetchAlerts);
-
-    setInterval(fetchAlerts, 10000);
 </script>
 
 <!-- Register the service worker -->
