@@ -247,8 +247,10 @@
         `);
         printWindow.document.close();
 
-        // Trigger the print dialog
-        printWindow.print();
+        // Wait for the content to load before printing
+        printWindow.onload = function () {
+            printWindow.print();
+        };
     }
 
     document.addEventListener("DOMContentLoaded", () => {
