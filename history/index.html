@@ -266,11 +266,11 @@
                     status = "Critical";
                     actionRequired = "Evacuate immediately";
                     statusClass = "status-critical";
-                } else if (alert.water_level >= 10) {
+                } else if (alert.water_level >= 5) {
                     status = "High";
                     actionRequired = "Prepare for possible evacuation";
                     statusClass = "status-high";
-                } else if (alert.water_level >= 5) {
+                } else if (alert.water_level < 5) {
                     status = "Moderate";
                     actionRequired = "Monitor closely";
                     statusClass = "status-moderate";
