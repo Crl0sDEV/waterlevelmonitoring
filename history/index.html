@@ -257,35 +257,39 @@
         const tableBody = document.querySelector("table tbody");
         tableBody.innerHTML = "";
         data.forEach(alert => {
-            const alertDate = new Date(alert.last_updated);
-            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0");
-            if (month === "all" || alertMonth === month) {
-                let statusClass = "";
+    const alertDate = new Date(alert.last_updated);
+    const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0");
 
-                if (alert.water_level >= 15) {
-                    status = "Critical";
-                    actionRequired = "Evacuate immediately";
-                    statusClass = "status-critical";
-                } else if (alert.water_level >= 5) {
-                    status = "High";
-                    actionRequired = "Prepare for possible evacuation";
-                    statusClass = "status-high";
-                } else if (alert.water_level < 5) {
-                    status = "Moderate";
-                    actionRequired = "Monitor closely";
-                    statusClass = "status-moderate";
-                }
+    if (month === "all" || alertMonth === month) {
+        let status = "";
+        let actionRequired = "";
+        let statusClass = "";
 
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${alertDate.toLocaleString()}</td>
-                    <td>${alert.water_level.toFixed(1)} cm</td>
-                    <td class="${statusClass}">${status}</td>
-                    <td>${actionRequired}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-        });
+        if (alert.water_level >= 15) {
+            status = "Critical";
+            actionRequired = "Evacuate immediately";
+            statusClass = "status-critical";
+        } else if (alert.water_level >= 5) {
+            status = "High";
+            actionRequired = "Prepare for possible evacuation";
+            statusClass = "status-high";
+        } else {
+            status = "Moderate";
+            actionRequired = "Monitor closely";
+            statusClass = "status-moderate";
+        }
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${alertDate.toLocaleString()}</td>
+            <td>${alert.water_level.toFixed(1)} cm</td>
+            <td class="${statusClass}">${status}</td>
+            <td>${actionRequired}</td>
+        `;
+        tableBody.appendChild(row);
+    }
+});
+
     }
 
     function printTable() {
