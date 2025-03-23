@@ -216,45 +216,94 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <!-- jQuery (required by AdminLTE) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Function to print the table
-    function printTable() {
-        // Clone the table to avoid modifying the original
-        const table = document.querySelector(".table").cloneNode(true);
 
-        // Remove the color legend from the cloned table
-        const colorLegend = table.querySelector(".color-legend");
-        if (colorLegend) {
-            colorLegend.remove();
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let lastWaterLevel = null;
+
+    function showNotification(title, message) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body: message, icon: "image/water-level-3-48.png" });
         }
+    }
 
-        // Create a new window for printing
+    const channel = supabase.channel("water-level-updates")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "water_levels" }, (payload) => {
+            const latestWaterLevel = payload.new.water_level;
+            if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel && latestWaterLevel < 15) {
+                showNotification(
+                    "Early Warning: Water Level Rising",
+                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm`
+                );
+            }
+            if (latestWaterLevel >= 15 && localStorage.getItem("warningNotificationShown") !== "true") {
+                showNotification("Water Level Alert", `Warning: Critically high at ${latestWaterLevel.toFixed(1)}cm!`);
+                localStorage.setItem("warningNotificationShown", "true");
+            } else if (latestWaterLevel < 15) {
+                localStorage.setItem("warningNotificationShown", "false");
+            }
+            lastWaterLevel = latestWaterLevel;
+        }).subscribe();
+
+    async function fetchAlerts(month = "all") {
+        const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
+        if (error) return console.error("Error fetching data:", error);
+
+        const tableBody = document.querySelector("table tbody");
+        tableBody.innerHTML = "";
+        data.forEach(alert => {
+            const alertDate = new Date(alert.last_updated);
+            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0");
+            if (month === "all" || alertMonth === month) {
+                let status = "Normal", actionRequired = "Monitor";
+                let statusClass = "";
+
+                if (alert.water_level >= 15) {
+                    status = "Critical";
+                    actionRequired = "Evacuate immediately";
+                    statusClass = "status-critical";
+                } else if (alert.water_level >= 10) {
+                    status = "High";
+                    actionRequired = "Prepare for possible evacuation";
+                    statusClass = "status-high";
+                } else if (alert.water_level >= 5) {
+                    status = "Moderate";
+                    actionRequired = "Monitor closely";
+                    statusClass = "status-moderate";
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${alertDate.toLocaleString()}</td>
+                    <td>${alert.water_level.toFixed(1)} cm</td>
+                    <td class="${statusClass}">${status}</td>
+                    <td>${actionRequired}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        });
+    }
+
+    function printTable() {
+        const table = document.querySelector(".table").cloneNode(true);
         const printWindow = window.open("", "_blank");
         printWindow.document.write(`
             <html>
                 <head>
                     <title>Water Level History</title>
                     <style>
-                        /* General styles */
-                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-                        h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                        body { font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #000; padding: 8px; }
                         th { background-color: #f2f2f2; }
                         .status-critical { color: red; font-weight: bold; }
                         .status-high { color: orange; font-weight: bold; }
                         .status-moderate { color: gold; font-weight: bold; }
-
-                        /* Print-specific styles */
-                        @media print {
-                            @page {
-                                margin: 2cm; /* Add margin to all sides of the page */
-                                size: auto; /* Ensure the page size is auto */
-                            }
-                            body { margin: 0; padding: 0; } /* Reset body margin and padding */
-                            h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* Ensure table fits within margins */
-                        }
                     </style>
                 </head>
                 <body>
@@ -264,11 +313,7 @@
             </html>
         `);
         printWindow.document.close();
-
-        // Wait for the content to load before printing
-        printWindow.onload = function () {
-            printWindow.print();
-        };
+        printWindow.onload = () => printWindow.print();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -277,99 +322,16 @@
             document.body.classList.toggle("sidebar-collapse");
         });
 
-        // Fetch initial data
-        fetchAlerts();
+        fetchAlerts();  // Now works because it's in scope
 
-        // Add event listener for month filter
         const monthFilter = document.getElementById("monthFilter");
         monthFilter.addEventListener("change", (event) => {
-            const selectedMonth = event.target.value;
-            fetchAlerts(selectedMonth);
+            fetchAlerts(event.target.value);
         });
+
+        // Attach print function to global window object
+        window.printTable = printTable;
     });
-    async function fetchAlerts(month = "all") {
-        const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
-        if (error) return console.error("Error fetching data:", error);
-        const tableBody = document.querySelector("table tbody");
-        tableBody.innerHTML = "";
-        data.forEach(alert => {
-            const alertDate = new Date(alert.last_updated);
-            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0"); // Get month in "MM" format
-
-            // Filter by month
-            if (month === "all" || alertMonth === month) {
-                let status = "Normal", actionRequired = "Monitor";
-                if (alert.water_level >= 15) {
-                    status = "Critical";
-                    actionRequired = "Evacuate immediately";
-                } else if (alert.water_level >= 6) {
-                    status = "High";
-                    actionRequired = "Prepare for possible evacuation";
-                } else {
-                    status = "Moderate";
-                    actionRequired = "Monitor closely";
-                }
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${alertDate.toLocaleString()}</td>
-                    <td>${alert.water_level} cm</td>
-                    <td class="status-${status.toLowerCase()}">${status}</td>
-                    <td>${actionRequired}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', fetchAlerts);
-
-</script>
-<script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    const SUPABASE_URL = 'https://efirubankmowqztlyuuh.supabase.co'; // Replace with your Supabase URL
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let lastWaterLevel = null;
-      let notificationShown = false;
-      function showNotification(title, message) {
-        if (Notification.permission === "granted") {
-          new Notification(title, { body: message, icon: "image/water-level-3-48.png" });
-        }
-      }
-      const channel = supabase.channel("water-level-updates").on("postgres_changes", { event: "INSERT", schema: "public", table: "water_levels" }, (payload) => {
-        const latestWaterLevel = payload.new.water_level;
-       // **Early Warning System**
-       if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
-                // Early Warning: Trigger only if the water level is rising and below 15
-                if (latestWaterLevel < 15) {
-                    showNotification(
-                        "Early Warning: Water Level Rising",
-                        `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
-                    );
-                }
-            }
-
-            // **Warning Alert System**
-            if (latestWaterLevel >= 15) {
-                if (localStorage.getItem("warningNotificationShown") !== "true") {
-                    showNotification(
-                        "Water Level Alert",
-                        `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
-                    );
-                    localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
-                }
-            } else {
-                // Reset the flag if the water level drops below 15
-                localStorage.setItem("warningNotificationShown", "false");
-            }
-            // Update the last water level
-            lastWaterLevel = latestWaterLevel;
-      }).subscribe();
-
-      setInterval(fetchAlerts, 1000);
 </script>
 
 <!-- Register the service worker -->
