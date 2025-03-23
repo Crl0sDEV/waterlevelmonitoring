@@ -129,6 +129,17 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Function to determine the colors based on water level
+    function getColorForWaterLevel(waterLevel) {
+        if (waterLevel < 6) {
+            return { backgroundColor: "gold", borderColor: "darkgoldenrod" }; // Colors for water level less than 6 cm
+        } else if (waterLevel >= 6 && waterLevel < 15) {
+            return { backgroundColor: "orange", borderColor: "darkorange" }; // Colors for water level between 6 cm and 15 cm
+        } else {
+            return { backgroundColor: "red", borderColor: "darkred" }; // Colors for water level greater than or equal to 15 cm
+        }
+    }
+
     // Initialize the line chart
     const lineCtx = document.getElementById('lineChart').getContext('2d');
     const lineChart = new Chart(lineCtx, {
@@ -178,7 +189,9 @@
             datasets: [{
                 label: 'Highest Water Level (cm)',
                 data: [], // Will be populated dynamically
-                backgroundColor: 'lightblue'
+                backgroundColor: [], // Will be populated dynamically based on water level
+                borderColor: [], // Will be populated dynamically based on water level
+                borderWidth: 2, // Border width
             }]
         },
         options: {
@@ -207,11 +220,63 @@
         },
     });
 
-    // Function to update the bar chart
-    function updateBarChart(labels, data) {
+    // Function to update the bar chart with new data and colors
+    function updateBarChart(labels, waterLevels) {
+        // Map water levels to their corresponding colors
+        const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level).backgroundColor);
+        const borderColors = waterLevels.map((level) => getColorForWaterLevel(level).borderColor);
+
+        // Update the chart data
         barChart.data.labels = labels;
-        barChart.data.datasets[0].data = data;
+        barChart.data.datasets[0].data = waterLevels;
+        barChart.data.datasets[0].backgroundColor = backgroundColors;
+        barChart.data.datasets[0].borderColor = borderColors;
+
+        // Update the chart
         barChart.update();
+    }
+
+    // Function to fetch and update bar chart data
+    async function updateBarChartData() {
+        try {
+            const { data, error } = await supabase
+                .from('water_levels')
+                .select('water_level, last_updated')
+                .order('last_updated', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching data for bar chart:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                const dailyMaxLevels = {};
+                data.forEach(entry => {
+                    const date = new Date(entry.last_updated).toLocaleDateString();
+                    if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
+                        dailyMaxLevels[date] = entry.water_level;
+                    }
+                });
+
+                const labels = Object.keys(dailyMaxLevels);
+                const waterLevels = Object.values(dailyMaxLevels);
+
+                const sortedData = labels
+                    .map((label, index) => ({
+                        date: new Date(label),
+                        level: waterLevels[index],
+                    }))
+                    .sort((a, b) => a.date - b.date);
+
+                const sortedLabels = sortedData.map(entry => entry.date.toLocaleDateString());
+                const sortedWaterLevels = sortedData.map(entry => entry.level);
+
+                // Update the bar chart with new data and colors
+                updateBarChart(sortedLabels, sortedWaterLevels);
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err);
+        }
     }
 </script>
 <script>
@@ -266,47 +331,6 @@
         hours = hours % 12 || 12;
         const minutesFormatted = minutes < 10 ? '0' + minutes : minutes;
         return `${hours}:${minutesFormatted} ${ampm}`;
-    }
-
-    async function updateBarChartData() {
-        try {
-            const { data, error } = await supabase
-                .from('water_levels')
-                .select('water_level, last_updated')
-                .order('last_updated', { ascending: false });
-
-            if (error) {
-                console.error('Error fetching data for bar chart:', error);
-                return;
-            }
-
-            if (data && data.length > 0) {
-                const dailyMaxLevels = {};
-                data.forEach(entry => {
-                    const date = new Date(entry.last_updated).toLocaleDateString();
-                    if (!dailyMaxLevels[date] || entry.water_level > dailyMaxLevels[date]) {
-                        dailyMaxLevels[date] = entry.water_level;
-                    }
-                });
-
-                const labels = Object.keys(dailyMaxLevels);
-                const waterLevels = Object.values(dailyMaxLevels);
-
-                const sortedData = labels
-                    .map((label, index) => ({
-                        date: new Date(label),
-                        level: waterLevels[index],
-                    }))
-                    .sort((a, b) => a.date - b.date);
-
-                const sortedLabels = sortedData.map(entry => entry.date.toLocaleDateString());
-                const sortedWaterLevels = sortedData.map(entry => entry.level);
-
-                updateBarChart(sortedLabels, sortedWaterLevels);
-            }
-        } catch (err) {
-            console.error('Unexpected error:', err);
-        }
     }
 
     const channel = supabase
