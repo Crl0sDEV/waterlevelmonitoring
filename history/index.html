@@ -217,21 +217,30 @@
                 <head>
                     <title>Water Level History</title>
                     <style>
+                        /* General styles */
                         body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                         th, td { border: 1px solid #000; padding: 8px; text-align: left; }
                         th { background-color: #f2f2f2; }
                         .status-critical { color: red; font-weight: bold; }
                         .status-high { color: orange; font-weight: bold; }
                         .status-moderate { color: gold; font-weight: bold; }
+
+                        /* Print-specific styles */
                         @media print {
-                            @page { margin: 0; } /* Remove default margin */
-                            body { margin: 2cm; } /* Add custom margin */
+                            @page {
+                                margin: 2cm; /* Add margin to all sides of the page */
+                                size: auto; /* Ensure the page size is auto */
+                            }
+                            body { margin: 0; padding: 0; } /* Reset body margin and padding */
+                            h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* Ensure table fits within margins */
                         }
                     </style>
                 </head>
                 <body>
-                    <h2 style="text-align: center; margin-bottom: 20px;">Water Level History</h2>
+                    <h2>Water Level History</h2>
                     ${table.outerHTML}
                 </body>
             </html>
