@@ -148,7 +148,6 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Alert ID</th>
                                                 <th>Date & Time</th>
                                                 <th>Level</th>
                                                 <th>Status</th>
@@ -234,7 +233,7 @@
             lastWaterLevel = latestWaterLevel;
       }).subscribe();
       async function fetchAlerts() {
-        const { data, error } = await supabase.from("water_levels").select("id, water_level, last_updated").order("last_updated", { ascending: false });
+        const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
         if (error) return console.error("Error fetching data:", error);
         const tableBody = document.querySelector("table tbody");
         tableBody.innerHTML = "";
@@ -250,7 +249,7 @@
             }
 
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${alert.id}</td><td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} cm</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
+          row.innerHTML = `<td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} cm</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
             tableBody.appendChild(row);
         });
     }
