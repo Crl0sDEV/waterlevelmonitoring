@@ -235,7 +235,7 @@
           // Fetch data from Supabase
           const { data, error } = await supabase
             .from("water_levels")
-            .select("id, water_level, last_updated")
+            .select("water_level, last_updated")
             .gte("water_level", 15) // Filter for water levels ≥ 15cm
             .order("last_updated", { ascending: false });
 
@@ -258,7 +258,6 @@
 
             // Add row data
             row.innerHTML = `
-              <td>${alert.id}</td>
               <td>${new Date(alert.last_updated).toLocaleString()}</td>
               <td>${alert.water_level} cm</td>
               <td class="status-critical">${status}</td>
