@@ -225,13 +225,17 @@
                         .status-high { color: orange; font-weight: bold; }
                         .status-moderate { color: gold; font-weight: bold; }
                         @media print {
-                            @page { margin: 0; } /* Remove default margin */
-                            body { margin: 1cm; } /* Add custom margin */
+                            @page {
+                                margin: 2cm; /* Add margin to all sides of the page */
+                            }
+                            body { margin: 0; } /* Reset body margin */
+                            h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* Ensure table fits within margins */
                         }
                     </style>
                 </head>
                 <body>
-                    <h2 style="text-align: center; margin-bottom: 20px;">Water Level History</h2>
+                    <h2>Water Level History</h2>
                     ${table.outerHTML}
                 </body>
             </html>
