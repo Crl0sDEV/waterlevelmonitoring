@@ -310,86 +310,109 @@
         },
       });
     
-      // Chart.js initialization
-      const ctx = document.getElementById("waterLevelChart").getContext("2d");
-      const waterLevelChart = new Chart(ctx, {
-        type: "bar", // Changed to bar chart
-        data: {
-          labels: [], // Will be populated dynamically
-          datasets: [
-            {
-              label: "Water Level (cm)",
-              data: [], // Will be populated dynamically
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 2,
-            },
-          ],
+      // Function to determine the color based on water level
+function getColorForWaterLevel(waterLevel) {
+  if (waterLevel < 6) {
+    return "gold"; // Color for water level less than 6 cm
+  } else if (waterLevel >= 6 && waterLevel < 15) {
+    return "orange"; // Color for water level between 6 cm and 15 cm
+  } else {
+    return "red"; // Color for water level greater than or equal to 15 cm
+  }
+}
+
+// Chart.js initialization
+const ctx = document.getElementById("waterLevelChart").getContext("2d");
+const waterLevelChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: [], // Will be populated dynamically
+    datasets: [
+      {
+        label: "Water Level (cm)",
+        data: [], // Will be populated dynamically
+        backgroundColor: [], // Will be populated dynamically based on water level
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 2,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Water Level (cm)",
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: "Water Level (cm)",
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: "Date",
-              },
-            },
-          },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Date",
         },
-      });
-    
-      // Fetch water level data from Supabase based on date range
-      async function fetchWaterLevelData(startDate, endDate) {
-        try {
-          const { data, error } = await supabase
-            .from("water_levels") // Replace with your table name
-            .select("*")
-            .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
-            .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
-            .order("last_updated", { ascending: true }); // Order by timestamp
-    
-          if (error) {
-            console.error("Error fetching data:", error);
-            return;
-          }
-    
-          if (data && data.length > 0) {
-            const labels = data.map((entry) =>
-              new Date(entry.last_updated).toLocaleDateString()
-            );
-            const waterLevels = data.map((entry) => entry.water_level);
-    
-            // Update the chart
-            waterLevelChart.data.labels = labels;
-            waterLevelChart.data.datasets[0].data = waterLevels;
-            waterLevelChart.update();
-          } else {
-            console.log("No data found for the selected date range.");
-          }
-        } catch (err) {
-          console.error("Error:", err);
-        }
-      }
-    
-      // Fetch initial data (last 7 days by default)
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(endDate.getDate() - 7); // Last 7 days
-      fetchWaterLevelData(startDate, endDate);
+      },
+    },
+  },
+});
+
+// Function to update the chart with new data and colors
+function updateChart(labels, waterLevels) {
+  // Map water levels to their corresponding colors
+  const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level));
+
+  // Update the chart data
+  waterLevelChart.data.labels = labels;
+  waterLevelChart.data.datasets[0].data = waterLevels;
+  waterLevelChart.data.datasets[0].backgroundColor = backgroundColors;
+
+  // Update the chart
+  waterLevelChart.update();
+}
+
+// Fetch water level data from Supabase based on date range
+async function fetchWaterLevelData(startDate, endDate) {
+  try {
+    const { data, error } = await supabase
+      .from("water_levels") // Replace with your table name
+      .select("*")
+      .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
+      .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
+      .order("last_updated", { ascending: true }); // Order by timestamp
+
+    if (error) {
+      console.error("Error fetching data:", error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const labels = data.map((entry) =>
+        new Date(entry.last_updated).toLocaleDateString()
+      );
+      const waterLevels = data.map((entry) => entry.water_level);
+
+      // Update the chart with new data and colors
+      updateChart(labels, waterLevels);
+    } else {
+      console.log("No data found for the selected date range.");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+}
+
+// Fetch initial data (last 7 days by default)
+const endDate = new Date();
+const startDate = new Date();
+startDate.setDate(endDate.getDate() - 7); // Last 7 days
+fetchWaterLevelData(startDate, endDate);
     
       // Request notification permission
       if (Notification.permission !== "granted") {
