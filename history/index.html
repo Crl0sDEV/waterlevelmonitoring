@@ -145,6 +145,24 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Water Level History</h3>
+                                <!-- Month Filter Dropdown -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <select id="monthFilter" class="form-control">
+                                        <option value="all">All Months</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
                                 <!-- Color Code Section -->
                                 <div class="color-legend">
                                     <div class="color-legend-item">
@@ -230,10 +248,10 @@
                         /* Print-specific styles */
                         @media print {
                             @page {
-                                margin: 0cm; /* Add margin to all sides of the page */
+                                margin: 2cm; /* Add margin to all sides of the page */
                                 size: auto; /* Ensure the page size is auto */
                             }
-                            body { margin: 2cm; padding: 0; } /* Reset body margin and padding */
+                            body { margin: 0; padding: 0; } /* Reset body margin and padding */
                             h2 { text-align: center; margin-bottom: 20px; } /* Center the title */
                             table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* Ensure table fits within margins */
                         }
@@ -257,6 +275,16 @@
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
         toggleButton.addEventListener("click", () => {
             document.body.classList.toggle("sidebar-collapse");
+        });
+
+        // Fetch initial data
+        fetchAlerts();
+
+        // Add event listener for month filter
+        const monthFilter = document.getElementById("monthFilter");
+        monthFilter.addEventListener("change", (event) => {
+            const selectedMonth = event.target.value;
+            fetchAlerts(selectedMonth);
         });
     });
 </script>
@@ -303,25 +331,38 @@
             // Update the last water level
             lastWaterLevel = latestWaterLevel;
       }).subscribe();
-      async function fetchAlerts() {
+      async function fetchAlerts(month = "all") {
         const { data, error } = await supabase.from("water_levels").select("water_level, last_updated").order("last_updated", { ascending: false });
         if (error) return console.error("Error fetching data:", error);
         const tableBody = document.querySelector("table tbody");
         tableBody.innerHTML = "";
         data.forEach(alert => {
-          let status = "Normal", actionRequired = "Monitor";
-          if (alert.water_level >= 15) { status = "Critical"; actionRequired = "Evacuate immediately"; }
-          else if (alert.water_level >= 6) {
-                status = 'High';
-                actionRequired = 'Prepare for possible evacuation';
-            } else {
-                status = 'Moderate';
-                actionRequired = 'Monitor closely';
-            }
+            const alertDate = new Date(alert.last_updated);
+            const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0"); // Get month in "MM" format
 
-          const row = document.createElement("tr");
-          row.innerHTML = `<td>${new Date(alert.last_updated).toLocaleString()}</td><td>${alert.water_level} cm</td><td class="status-${status.toLowerCase()}">${status}</td><td>${actionRequired}</td>`;
-            tableBody.appendChild(row);
+            // Filter by month
+            if (month === "all" || alertMonth === month) {
+                let status = "Normal", actionRequired = "Monitor";
+                if (alert.water_level >= 15) {
+                    status = "Critical";
+                    actionRequired = "Evacuate immediately";
+                } else if (alert.water_level >= 6) {
+                    status = "High";
+                    actionRequired = "Prepare for possible evacuation";
+                } else {
+                    status = "Moderate";
+                    actionRequired = "Monitor closely";
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${alertDate.toLocaleString()}</td>
+                    <td>${alert.water_level} cm</td>
+                    <td class="status-${status.toLowerCase()}">${status}</td>
+                    <td>${actionRequired}</td>
+                `;
+                tableBody.appendChild(row);
+            }
         });
     }
 
