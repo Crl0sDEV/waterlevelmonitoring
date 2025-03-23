@@ -260,7 +260,6 @@
             const alertDate = new Date(alert.last_updated);
             const alertMonth = String(alertDate.getMonth() + 1).padStart(2, "0");
             if (month === "all" || alertMonth === month) {
-                let status = "Normal", actionRequired = "Monitor";
                 let statusClass = "";
 
                 if (alert.water_level >= 15) {
