@@ -143,10 +143,9 @@
                     <div class="col-lg-12">
                         <!-- Alerts Table -->
                         <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Water Level History</h3>
-                                <!-- Month Filter Dropdown -->
-                                <div class="form-group" style="margin-bottom: 0;">
+                            <div class="card-header justify-content-between">
+                                <!-- Month Filter Dropdown (Left-aligned) -->
+                                <div class="form-group mb-0">
                                     <select id="monthFilter" class="form-control">
                                         <option value="all">All Months</option>
                                         <option value="01">January</option>
@@ -163,8 +162,9 @@
                                         <option value="12">December</option>
                                     </select>
                                 </div>
-                                <!-- Color Code Section -->
-                                <div class="color-legend">
+                            
+                                <!-- Color Code Section (Right-aligned) -->
+                                <div class="color-legend ml-auto">
                                     <div class="color-legend-item">
                                         <div class="color-box critical"></div>
                                         <span>Critical (Evacuate immediately)</span>
@@ -178,7 +178,7 @@
                                         <span>Moderate (Monitor closely)</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div>                            
                             <div class="card-body">
                                 <div class="table-container">
                                     <table class="table table-bordered table-hover">
