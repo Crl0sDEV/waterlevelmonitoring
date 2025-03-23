@@ -311,13 +311,14 @@
       });
     
       // Function to determine the color based on water level
+// Function to determine the color based on water level
 function getColorForWaterLevel(waterLevel) {
   if (waterLevel < 6) {
-    return "gold"; // Color for water level less than 6 cm
+    return { backgroundColor: "gold", borderColor: "darkgoldenrod" }; // Colors for water level less than 6 cm
   } else if (waterLevel >= 6 && waterLevel < 15) {
-    return "orange"; // Color for water level between 6 cm and 15 cm
+    return { backgroundColor: "orange", borderColor: "darkorange" }; // Colors for water level between 6 cm and 15 cm
   } else {
-    return "red"; // Color for water level greater than or equal to 15 cm
+    return { backgroundColor: "red", borderColor: "darkred" }; // Colors for water level greater than or equal to 15 cm
   }
 }
 
@@ -332,8 +333,8 @@ const waterLevelChart = new Chart(ctx, {
         label: "Water Level (cm)",
         data: [], // Will be populated dynamically
         backgroundColor: [], // Will be populated dynamically based on water level
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 2,
+        borderColor: [], // Will be populated dynamically based on water level
+        borderWidth: 2, // Border width
       },
     ],
   },
@@ -366,12 +367,14 @@ const waterLevelChart = new Chart(ctx, {
 // Function to update the chart with new data and colors
 function updateChart(labels, waterLevels) {
   // Map water levels to their corresponding colors
-  const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level));
+  const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level).backgroundColor);
+  const borderColors = waterLevels.map((level) => getColorForWaterLevel(level).borderColor);
 
   // Update the chart data
   waterLevelChart.data.labels = labels;
   waterLevelChart.data.datasets[0].data = waterLevels;
   waterLevelChart.data.datasets[0].backgroundColor = backgroundColors;
+  waterLevelChart.data.datasets[0].borderColor = borderColors;
 
   // Update the chart
   waterLevelChart.update();
