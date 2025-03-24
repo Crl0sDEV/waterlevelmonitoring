@@ -69,6 +69,11 @@
             <span class="nav-text">Dashboard</span>
           </li>
         </ul>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <span class="nav-text" id="navbar-clock">--:--</span>
+          </li>
+        </ul>
       </nav>
 
       <!-- Main Sidebar Container -->
@@ -149,7 +154,7 @@
                 </div>
               </div>
               <!-- Alerts Card -->
-              <div class="col-lg-2 col-6">
+              <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
                   <div class="inner">
                     <h3>0</h3>
@@ -161,25 +166,15 @@
                 </div>
               </div>
               <!-- History Card -->
-              <div class="col-lg-2 col-6">
+              <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                   <div class="inner">
                     <h3>0</h3>
-                    <p>History Records</p>
+                    <p>History</p>
                   </div>
                   <a href="/history" class="small-box-footer"
                     >More info <i class="fas fa-arrow-circle-right"></i
                   ></a>
-                </div>
-              </div>
-              <!-- Real-time Clock Card -->
-              <div class="col-lg-2 col-6">
-                <div class="small-box bg-secondary">
-                  <div class="inner">
-                    <h3 id="time">--:--</h3>
-                    <p>Real-time Clock</p>
-                  </div>
-                  <p class="text-center small-box-footer" id="date"></p>
                 </div>
               </div>
             </div>
@@ -267,27 +262,19 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
-      // Update the clock and date every second
-      function updateTime() {
+      function updateNavbarClock() {
         const options = {
           timeZone: "Asia/Manila",
           hour: "2-digit",
           minute: "2-digit",
+          hour12: true
         };
         const time = new Date().toLocaleTimeString("en-US", options);
-        const date = new Date().toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-
-        document.getElementById("time").textContent = time;
-        document.getElementById("date").textContent = date;
+        document.getElementById("navbar-clock").textContent = time;
       }
 
-      setInterval(updateTime, 1000); // Update every second
-      updateTime(); // Initial call to set the time immediately
+      setInterval(updateNavbarClock, 1000);
+      updateNavbarClock();
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -305,7 +292,6 @@
       const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog";
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     
-      // Add a variable to store the last water level
       let lastWaterLevel = null;
     
       const dateRangePicker = flatpickr("#dateRangePicker", {
