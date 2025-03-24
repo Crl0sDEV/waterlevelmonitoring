@@ -78,7 +78,7 @@
 .small-box.bg-success, 
 .small-box.bg-secondary {
   background-color: white !important;
-  color: #555555 !important; /* Lighter text color */
+  color: blue !important; /* Lighter text color */
 }
 
 /* Adjust the icon color to a lighter shade */
