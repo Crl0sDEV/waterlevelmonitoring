@@ -72,3 +72,16 @@
     margin-left: 10px;
 }
 
+/* Override the background colors for all cards */
+.small-box.bg-info, 
+.small-box.bg-danger, 
+.small-box.bg-success, 
+.small-box.bg-secondary {
+  background-color: white !important;
+  color: black !important; /* Adjust text color if needed */
+}
+
+/* Adjust the icon color if needed */
+.small-box .icon {
+  color: black !important;
+}
