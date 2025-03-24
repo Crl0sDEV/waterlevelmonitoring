@@ -131,9 +131,9 @@
 <script>
     // Function to determine the colors based on water level
     function getColorForWaterLevel(waterLevel) {
-        if (waterLevel < 6) {
+        if (waterLevel < 2) {
             return { backgroundColor: "gold", borderColor: "darkgoldenrod" }; // Colors for water level less than 6 cm
-        } else if (waterLevel >= 6 && waterLevel < 15) {
+        } else if (waterLevel >= 2 && waterLevel < 3) {
             return { backgroundColor: "orange", borderColor: "darkorange" }; // Colors for water level between 6 cm and 15 cm
         } else {
             return { backgroundColor: "red", borderColor: "darkred" }; // Colors for water level greater than or equal to 15 cm
@@ -147,7 +147,7 @@
         data: {
             labels: [], // Will be populated dynamically
             datasets: [{
-                label: 'Water Level (cm)',
+                label: 'Water Level (m)',
                 data: [], // Will be populated dynamically
                 borderColor: 'blue',
                 tension: 0.4,
@@ -167,7 +167,7 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Water Level (cm)',
+                        text: 'Water Level (m)',
                     },
                 },
                 x: {
@@ -187,7 +187,7 @@
         data: {
             labels: [], // Will be populated dynamically
             datasets: [{
-                label: 'Highest Water Level (cm)',
+                label: 'Highest Water Level (m)',
                 data: [], // Will be populated dynamically
                 backgroundColor: [], // Will be populated dynamically based on water level
                 borderColor: [], // Will be populated dynamically based on water level
@@ -207,7 +207,7 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Water Level (cm)',
+                        text: 'Water Level (m)',
                     },
                 },
                 x: {
@@ -302,7 +302,7 @@
             const lastUpdated = new Date(payload.new.last_updated).toLocaleString();
             const formattedTime = formatTime(payload.new.last_updated);
 
-            document.getElementById('waterLevel').innerText = `${latestWaterLevel} cm`;
+            document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
             document.getElementById('lastUpdated').innerText = lastUpdated;
 
             const labels = lineChart.data.labels;
@@ -322,20 +322,20 @@
             // **Early Warning System**
             if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
                 // Early Warning: Trigger only if the water level is rising and below 15
-                if (latestWaterLevel < 15) {
+                if (latestWaterLevel < 3) {
                     showNotification(
                         "Early Warning: Water Level Rising",
-                        `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
+                        `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}m, Previous level: ${lastWaterLevel.toFixed(1)}m`
                     );
                 }
             }
 
             // **Warning Alert System**
-            if (latestWaterLevel >= 15) {
+            if (latestWaterLevel >= 3) {
                 if (localStorage.getItem("warningNotificationShown") !== "true") {
                     showNotification(
                         "Water Level Alert",
-                        `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
+                        `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}m!`
                     );
                     localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
                 }
@@ -369,7 +369,7 @@
                 updateChart(labels, waterLevels);
 
                 const latest = data[0];
-                document.getElementById('waterLevel').innerText = `${latest.water_level} cm`;
+                document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
                 document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
 
                 lastWaterLevel = latest.water_level;

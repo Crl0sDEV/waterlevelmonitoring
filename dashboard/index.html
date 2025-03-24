@@ -313,9 +313,9 @@
       // Function to determine the color based on water level
 // Function to determine the color based on water level
 function getColorForWaterLevel(waterLevel) {
-  if (waterLevel < 6) {
+  if (waterLevel < 2) {
     return { backgroundColor: "gold", borderColor: "darkgoldenrod" }; // Colors for water level less than 6 cm
-  } else if (waterLevel >= 6 && waterLevel < 15) {
+  } else if (waterLevel >= 2 && waterLevel < 3) {
     return { backgroundColor: "orange", borderColor: "darkorange" }; // Colors for water level between 6 cm and 15 cm
   } else {
     return { backgroundColor: "red", borderColor: "darkred" }; // Colors for water level greater than or equal to 15 cm
@@ -330,7 +330,7 @@ const waterLevelChart = new Chart(ctx, {
     labels: [], // Will be populated dynamically
     datasets: [
       {
-        label: "Water Level (cm)",
+        label: "Water Level (m)",
         data: [], // Will be populated dynamically
         backgroundColor: [], // Will be populated dynamically based on water level
         borderColor: [], // Will be populated dynamically based on water level
@@ -351,7 +351,7 @@ const waterLevelChart = new Chart(ctx, {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Water Level (cm)",
+          text: "Water Level (m)",
         },
       },
       x: {
@@ -461,7 +461,7 @@ fetchWaterLevelData(startDate, endDate);
               // Update the water level card
               const waterLevelCard = document.getElementById("waterLevelDisplay");
               if (waterLevelCard) {
-                waterLevelCard.textContent = latestWaterLevel.toFixed(2);
+                waterLevelCard.textContent = latestWaterLevel.toFixed(1);
                 console.log("Water level card updated:", latestWaterLevel);
               } else {
                 console.error("Water level card element not found!");
@@ -470,20 +470,20 @@ fetchWaterLevelData(startDate, endDate);
               // Check if water level is rising
               if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
                 // Early Warning: Trigger only if the water level is rising and below 15
-                if (latestWaterLevel < 15) {
+                if (latestWaterLevel < 3) {
                   showNotification(
                     "Early Warning: Water Level Rising",
-                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
+                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}m, Previous level: ${lastWaterLevel.toFixed(1)}m`
                   );
                 }
               }
     
               // Check if water level is 15 or above
-              if (latestWaterLevel >= 15) {
+              if (latestWaterLevel >= 3) {
                 if (localStorage.getItem("warningNotificationShown") !== "true") {
                   showNotification(
                     "Water Level Alert",
-                    `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
+                    `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}m!`
                   );
                   localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
                 }
@@ -550,13 +550,13 @@ fetchWaterLevelData(startDate, endDate);
           // Remove existing classes
           warningElement.classList.remove("critical", "high", "moderate");
     
-          if (waterLevel >= 15) {
+          if (waterLevel >= 3) {
             warningElement.textContent = "Status: Critical";
             warningElement.classList.add("critical");
-          } else if (waterLevel >= 6 && waterLevel < 15) {
+          } else if (waterLevel >= 2 && waterLevel < 3) {
             warningElement.textContent = "Status: High";
             warningElement.classList.add("high");
-          } else if (waterLevel < 6) {
+          } else if (waterLevel < 2) {
             warningElement.textContent = "Status: Moderate";
             warningElement.classList.add("moderate");
           }
@@ -571,7 +571,7 @@ fetchWaterLevelData(startDate, endDate);
           const { count, error } = await supabase
             .from("water_levels")
             .select("*", { count: "exact", head: true })
-            .gte("water_level", 15);
+            .gte("water_level", 3);
     
           if (error) {
             console.error("Error fetching high water level count:", error);

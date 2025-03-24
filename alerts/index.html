@@ -109,7 +109,7 @@
                 <!-- Alerts Table -->
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Recent Alerts (Water Level ≥ 15cm)</h3>
+                    <h3 class="card-title">Recent Alerts (Water Level ≥ 3m)</h3>
                   </div>
                   <div class="card-body">
                     <div class="table-container">
@@ -201,20 +201,20 @@
             // **Early Warning System**
             if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
               // Early Warning: Trigger only if the water level is rising and below 15
-              if (latestWaterLevel < 15) {
+              if (latestWaterLevel < 3) {
                 showNotification(
                   "Early Warning: Water Level Rising",
-                  `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm, Previous level: ${lastWaterLevel.toFixed(1)}cm`
+                  `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}m, Previous level: ${lastWaterLevel.toFixed(1)}m`
                 );
               }
             }
 
             // **Warning Alert System**
-            if (latestWaterLevel >= 15) {
+            if (latestWaterLevel >= 3) {
               if (localStorage.getItem("warningNotificationShown") !== "true") {
                 showNotification(
                   "Water Level Alert",
-                  `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}cm!`
+                  `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}m!`
                 );
                 localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
               }
@@ -235,7 +235,7 @@
           const { data, error } = await supabase
             .from("water_levels")
             .select("water_level, last_updated")
-            .gte("water_level", 15) // Filter for water levels ≥ 15cm
+            .gte("water_level", 3) // Filter for water levels ≥ 15cm
             .order("last_updated", { ascending: false });
 
           if (error) {

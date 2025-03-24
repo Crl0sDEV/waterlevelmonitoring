@@ -235,16 +235,16 @@
     const channel = supabase.channel("water-level-updates")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "water_levels" }, (payload) => {
             const latestWaterLevel = payload.new.water_level;
-            if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel && latestWaterLevel < 15) {
+            if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel && latestWaterLevel < 3) {
                 showNotification(
                     "Early Warning: Water Level Rising",
-                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}cm`
+                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}m`
                 );
             }
-            if (latestWaterLevel >= 15 && localStorage.getItem("warningNotificationShown") !== "true") {
-                showNotification("Water Level Alert", `Warning: Critically high at ${latestWaterLevel.toFixed(1)}cm!`);
+            if (latestWaterLevel >= 3 && localStorage.getItem("warningNotificationShown") !== "true") {
+                showNotification("Water Level Alert", `Warning: Critically high at ${latestWaterLevel.toFixed(1)}m!`);
                 localStorage.setItem("warningNotificationShown", "true");
-            } else if (latestWaterLevel < 15) {
+            } else if (latestWaterLevel < 3) {
                 localStorage.setItem("warningNotificationShown", "false");
             }
             lastWaterLevel = latestWaterLevel;
@@ -265,11 +265,11 @@
         let actionRequired = "";
         let statusClass = "";
 
-        if (alert.water_level >= 15) {
+        if (alert.water_level >= 3) {
             status = "Critical";
             actionRequired = "Evacuate immediately";
             statusClass = "status-critical";
-        } else if (alert.water_level >= 5) {
+        } else if (alert.water_level >= 2) {
             status = "High";
             actionRequired = "Prepare for possible evacuation";
             statusClass = "status-high";
@@ -282,7 +282,7 @@
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${alertDate.toLocaleString()}</td>
-            <td>${alert.water_level.toFixed(1)} cm</td>
+            <td>${alert.water_level.toFixed(1)} m</td>
             <td class="${statusClass}">${status}</td>
             <td>${actionRequired}</td>
         `;
