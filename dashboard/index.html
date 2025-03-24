@@ -85,6 +85,18 @@
   background-color: red;
   color: white;
 }
+
+.water-level-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#waterLevelStatus {
+  font-size: 16px;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
     </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
@@ -181,7 +193,10 @@
                     <h3 class="card-title">Current Water Level</h3>
                   </div>
                   <div class="card-body">
-                    <h2 id="waterLevel"></h2>
+                    <div class="d-flex align-items-center">
+                      <h2 id="waterLevel" class="mb-0"></h2>
+                      <span id="waterLevelStatus" class="chart-status-label ms-2"></span>
+                    </div>
                     <p>Last updated: <span id="lastUpdated"></span></p>
                   </div>
                 </div>
@@ -715,6 +730,7 @@ fetchWaterLevelData(startDate, endDate);
             const formattedTime = formatTime(payload.new.last_updated);
 
             document.getElementById('waterLevel').innerText = `${latestWaterLevel} m`;
+            updateWaterLevelStatus(latestWaterLevel);
             document.getElementById('lastUpdated').innerText = lastUpdated;
 
             const labels = lineChart.data.labels;
@@ -782,6 +798,7 @@ fetchWaterLevelData(startDate, endDate);
 
                 const latest = data[0];
                 document.getElementById('waterLevel').innerText = `${latest.water_level} m`;
+                updateWaterLevelStatus(latest.water_level);
                 document.getElementById('lastUpdated').innerText = new Date(latest.last_updated).toLocaleString();
 
                 lastWaterLevel = latest.water_level;
@@ -976,6 +993,25 @@ options: {
       barChart.update();
   }
 
+  function updateWaterLevelStatus(waterLevel) {
+  const statusElement = document.getElementById('waterLevelStatus');
+  if (!statusElement) return;
+  
+  // Remove all status classes
+  statusElement.classList.remove('status-moderate', 'status-high', 'status-critical');
+  
+  // Determine status and add appropriate class
+  if (waterLevel < 2) {
+    statusElement.textContent = 'Moderate';
+    statusElement.classList.add('status-moderate');
+  } else if (waterLevel >= 2 && waterLevel < 3) {
+    statusElement.textContent = 'High';
+    statusElement.classList.add('status-high');
+  } else {
+    statusElement.textContent = 'Critical';
+    statusElement.classList.add('status-critical');
+  }
+}
 </script>
 
     <script>
