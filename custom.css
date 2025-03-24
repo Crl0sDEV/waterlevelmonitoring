@@ -89,3 +89,18 @@
 .small-box-footer:hover {
   color: #333333 !important; /* Slightly darker on hover */
 }
+
+/* Add this CSS to remove the underline effect */
+.brand-link {
+    text-decoration: none !important; /* Remove underline */
+    cursor: default; /* Prevent pointer cursor */
+    pointer-events: none; /* Disable click events */
+  }
+  
+  .brand-link:hover {
+    text-decoration: none !important; /* Remove underline on hover */
+  }
+  
+  .brand-text {
+    text-decoration: none !important; /* Ensure no underline is applied to the text */
+  }
