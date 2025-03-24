@@ -25,14 +25,6 @@
     />
     <link rel="stylesheet" href="custom.css" />
     <style>
-      /* Add this CSS to remove the underline effect */
-      .brand-link:hover {
-        text-decoration: none; /* Remove underline on hover */
-      }
-      .brand-link .brand-text {
-        text-decoration: none; /* Ensure no underline is applied to the text */
-      }
-
       .warning-text {
   font-weight: bold; /* Medium font weight */
   font-size: 8px; /* Smaller font size */
@@ -69,6 +61,30 @@
   .small-box {
     width: 100%;
   }
+
+  /* Add this to your existing CSS */
+.chart-status-label {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.status-moderate {
+  background-color: gold;
+  color: black;
+}
+
+.status-high {
+  background-color: orange;
+  color: black;
+}
+
+.status-critical {
+  background-color: red;
+  color: white;
+}
     </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
@@ -201,7 +217,12 @@
               <div class="col-lg-12">
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Water Level Trends</h3>
+                    <h3 class="card-title">Water Level Trends
+                      <span class="chart-status-label status-moderate">Moderate</span>
+    <span class="chart-status-label status-high">High</span>
+    <span class="chart-status-label status-critical">Critical</span>
+                    </h3>
+                    
                     <!-- Date Range Picker -->
                     <div class="float-right">
                       <input
@@ -223,7 +244,11 @@
               <div class="col-lg-6">
                   <div class="card">
                       <div class="card-header">
-                          <h3 class="card-title">Water Level Over Time (Each Hour)</h3>
+                          <h3 class="card-title">Water Level Over Time (Each Hour)
+                            <span class="chart-status-label status-moderate">Moderate</span>
+    <span class="chart-status-label status-high">High</span>
+    <span class="chart-status-label status-critical">Critical</span>
+                          </h3>
                       </div>
                       <div class="card-body">
                           <canvas id="lineChart"></canvas>
@@ -234,7 +259,11 @@
               <div class="col-lg-6">
                   <div class="card">
                       <div class="card-header">
-                          <h3 class="card-title">Water Level Comparison (Each Day)</h3>
+                          <h3 class="card-title">Water Level Comparison (Each Day)
+                            <span class="chart-status-label status-moderate">Moderate</span>
+    <span class="chart-status-label status-high">High</span>
+    <span class="chart-status-label status-critical">Critical</span>
+                          </h3>
                       </div>
                       <div class="card-body">
                           <canvas id="barChart"></canvas>
@@ -277,6 +306,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <script>
       // Update the navbar clock and date every second
@@ -359,30 +390,43 @@ const waterLevelChart = new Chart(ctx, {
       },
     ],
   },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
+  // Update the chart options to include status labels
+options: {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+      position: "top",
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const value = context.raw;
+          let status = '';
+          if (value < 2) status = 'Moderate';
+          else if (value >= 2 && value < 3) status = 'High';
+          else status = 'Critical';
+          return `${context.dataset.label}: ${value} m (${status})`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
         display: true,
-        position: "top",
+        text: "Water Level (m)",
       },
     },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Water Level (m)",
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: "Date",
-        },
+    x: {
+      title: {
+        display: true,
+        text: "Date",
       },
     },
   },
+},
 });
 
 // Function to update the chart with new data and colors
@@ -795,7 +839,7 @@ fetchWaterLevelData(startDate, endDate);
         updateBarChartData();
     });
     
-      setInterval(fetchWaterLevelCount, 2000); // Fetch every 10 seconds 
+      setInterval(fetchWaterLevelCount, 2000);  
     </script>
 
 <script>
@@ -824,30 +868,43 @@ fetchWaterLevelData(startDate, endDate);
               fill: false
           }]
       },
-      options: {
-          responsive: true,
-          plugins: {
-              legend: {
-                  display: true,
-                  position: 'top',
-              },
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  title: {
-                      display: true,
-                      text: 'Water Level (m)',
-                  },
-              },
-              x: {
-                  title: {
-                      display: true,
-                      text: 'Time',
-                  },
-              },
-          },
+      // Update the line chart options
+options: {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top',
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const value = context.raw;
+          let status = '';
+          if (value < 2) status = 'Moderate';
+          else if (value >= 2 && value < 3) status = 'High';
+          else status = 'Critical';
+          return `${context.dataset.label}: ${value} m (${status})`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Water Level (m)',
       },
+    },
+    x: {
+      title: {
+        display: true,
+        text: 'Time',
+      },
+    },
+  },
+},
   });
 
   // Initialize the bar chart
@@ -864,30 +921,43 @@ fetchWaterLevelData(startDate, endDate);
               borderWidth: 2, // Border width
           }]
       },
-      options: {
-          responsive: true,
-          plugins: {
-              legend: {
-                  display: true,
-                  position: 'top',
-              },
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  title: {
-                      display: true,
-                      text: 'Water Level (m)',
-                  },
-              },
-              x: {
-                  title: {
-                      display: true,
-                      text: 'Date',
-                  },
-              },
-          },
+      // Update the bar chart options
+options: {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top',
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const value = context.raw;
+          let status = '';
+          if (value < 2) status = 'Moderate';
+          else if (value >= 2 && value < 3) status = 'High';
+          else status = 'Critical';
+          return `${context.dataset.label}: ${value} m (${status})`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Water Level (m)',
       },
+    },
+    x: {
+      title: {
+        display: true,
+        text: 'Date',
+      },
+    },
+  },
+},
   });
 
   // Function to update the bar chart with new data and colors
