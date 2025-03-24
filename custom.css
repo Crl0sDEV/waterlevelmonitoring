@@ -78,17 +78,17 @@
 .small-box.bg-success, 
 .small-box.bg-secondary {
   background-color: white !important;
-  color: #87CEFA !important; /* Lighter text color */
+  color: #007aff !important; /* Lighter text color */
 }
 
 /* Adjust the icon color to a lighter shade */
 .small-box .icon {
-  color: #333333 !important; /* Lighter icon color */
+  color: #373a43 !important; /* Lighter icon color */
 }
 
 /* Adjust the footer link color if needed */
 .small-box-footer {
-  color: #555555 !important; /* Lighter footer text color */
+  color: #373a43 !important; /* Lighter footer text color */
 }
 
 .small-box-footer:hover {
