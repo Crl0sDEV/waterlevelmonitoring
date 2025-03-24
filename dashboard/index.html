@@ -54,9 +54,17 @@
   color: gold; /* Gold text for moderate */
 }
 
-.card {
-  height: 100px;
-}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .row > .col-lg-6,
+  .row > .col-lg-3 {
+    display: flex;
+  }
+  .card {
+    flex: 1;
+  }
     </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
