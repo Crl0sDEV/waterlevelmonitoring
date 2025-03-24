@@ -223,7 +223,7 @@
               <div class="col-lg-6">
                   <div class="card">
                       <div class="card-header">
-                          <h3 class="card-title">Water Level Over Time (Line Chart)</h3>
+                          <h3 class="card-title">Water Level Over Time (Each Hour)</h3>
                       </div>
                       <div class="card-body">
                           <canvas id="lineChart"></canvas>
@@ -234,7 +234,7 @@
               <div class="col-lg-6">
                   <div class="card">
                       <div class="card-header">
-                          <h3 class="card-title">Water Level Comparison (Bar Chart)</h3>
+                          <h3 class="card-title">Water Level Comparison (Each Day)</h3>
                       </div>
                       <div class="card-body">
                           <canvas id="barChart"></canvas>
@@ -817,7 +817,7 @@ fetchWaterLevelData(startDate, endDate);
       data: {
           labels: [], // Will be populated dynamically
           datasets: [{
-              label: 'Water Level (m)',
+              label: 'Water Level (Each Hour)',
               data: [], // Will be populated dynamically
               borderColor: 'blue',
               tension: 0.4,
@@ -857,7 +857,7 @@ fetchWaterLevelData(startDate, endDate);
       data: {
           labels: [], // Will be populated dynamically
           datasets: [{
-              label: 'Highest Water Level (m)',
+              label: 'Highest Water Level (Each Day)',
               data: [], // Will be populated dynamically
               backgroundColor: [], // Will be populated dynamically based on water level
               borderColor: [], // Will be populated dynamically based on water level
