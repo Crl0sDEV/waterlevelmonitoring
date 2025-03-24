@@ -34,25 +34,32 @@
       }
 
       .warning-text {
-  font-weight: bold; /* Medium font weight */
-  font-size: 8px; /* Smaller font size */
-  background-color: white; /* White background */
-  display: inline-block; /* Ensure the background only wraps the text */
-  margin: 7px; /* Remove default margin */
-}
+        font-weight: bold; /* Medium font weight */
+        font-size: 8px; /* Smaller font size */
+        background-color: white; /* White background */
+        display: inline-block; /* Ensure the background only wraps the text */
+        margin: 7px; /* Remove default margin */
+      }
 
-/* Add text colors based on the status */
-.warning-text.critical {
-  color: red; /* Red text for critical */
-}
+      /* Add text colors based on the status */
+      .warning-text.critical {
+        color: red; /* Red text for critical */
+      }
 
-.warning-text.high {
-  color: orange; /* Orange text for high */
-}
+      .warning-text.high {
+        color: orange; /* Orange text for high */
+      }
 
-.warning-text.moderate {
-  color: gold; /* Gold text for moderate */
-}
+      .warning-text.moderate {
+        color: gold; /* Gold text for moderate */
+      }
+
+      #navbar-clock {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #444;
+        padding: 0 15px;
+      }
     </style>
   </head>
   <body class="hold-transition sidebar-mini layout-fixed">
@@ -69,6 +76,7 @@
             <span class="nav-text">Dashboard</span>
           </li>
         </ul>
+        <!-- Clock on the right side -->
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <span class="nav-text" id="navbar-clock">--:--</span>
@@ -141,18 +149,6 @@
           <div class="container-fluid">
             <!-- Small boxes (Stat box) -->
             <div class="row">
-              <!-- Real-time Data Display Card -->
-              <div class="col-lg-6">
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Current Water Level</h3>
-                  </div>
-                  <div class="card-body">
-                    <h2 id="waterLevel"></h2>
-                    <p>Last updated: <span id="lastUpdated"></span></p>
-                  </div>
-                </div>
-              </div>
               <!-- Alerts Card -->
               <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
@@ -204,27 +200,27 @@
             <div class="row">
               <!-- Line Chart -->
               <div class="col-lg-6">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">Water Level Over Time (Line Chart)</h3>
-                      </div>
-                      <div class="card-body">
-                          <canvas id="lineChart"></canvas>
-                      </div>
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Water Level Over Time (Line Chart)</h3>
                   </div>
+                  <div class="card-body">
+                    <canvas id="lineChart"></canvas>
+                  </div>
+                </div>
               </div>
               <!-- Bar Chart -->
               <div class="col-lg-6">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">Water Level Comparison (Bar Chart)</h3>
-                      </div>
-                      <div class="card-body">
-                          <canvas id="barChart"></canvas>
-                      </div>
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Water Level Comparison (Bar Chart)</h3>
                   </div>
+                  <div class="card-body">
+                    <canvas id="barChart"></canvas>
+                  </div>
+                </div>
               </div>
-          </div>
+            </div>
           </div>
           <!-- /.container-fluid -->
         </section>
@@ -262,20 +258,22 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
+      // Update the navbar clock every second
       function updateNavbarClock() {
         const options = {
           timeZone: "Asia/Manila",
           hour: "2-digit",
           minute: "2-digit",
-          hour12: true
+          hour12: true,
         };
         const time = new Date().toLocaleTimeString("en-US", options);
         document.getElementById("navbar-clock").textContent = time;
       }
 
       setInterval(updateNavbarClock, 1000);
-      updateNavbarClock();
+      updateNavbarClock(); // Initial call
     </script>
+
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
@@ -285,15 +283,14 @@
         });
       });
     </script>
+
     <script type="module">
       import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    
+
       const SUPABASE_URL = "https://efirubankmowqztlyuuh.supabase.co";
       const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmaXJ1YmFua21vd3F6dGx5dXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgzMDc5NjAsImV4cCI6MjA1Mzg4Mzk2MH0.JmTTNz5AESMKQIwQl9t0qfU33EMLc5Z2-WePRGtaCog";
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-      let lastWaterLevel = null;
-    
+
       const dateRangePicker = flatpickr("#dateRangePicker", {
         mode: "range",
         dateFormat: "Y-m-d",
@@ -304,319 +301,101 @@
           }
         },
       });
-    
-      // Function to determine the color based on water level
-// Function to determine the color based on water level
-function getColorForWaterLevel(waterLevel) {
-  if (waterLevel < 2) {
-    return { backgroundColor: "gold", borderColor: "darkgoldenrod" }; // Colors for water level less than 6 cm
-  } else if (waterLevel >= 2 && waterLevel < 3) {
-    return { backgroundColor: "orange", borderColor: "darkorange" }; // Colors for water level between 6 cm and 15 cm
-  } else {
-    return { backgroundColor: "red", borderColor: "darkred" }; // Colors for water level greater than or equal to 15 cm
-  }
-}
 
-// Chart.js initialization
-const ctx = document.getElementById("waterLevelChart").getContext("2d");
-const waterLevelChart = new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels: [], // Will be populated dynamically
-    datasets: [
-      {
-        label: "Water Level (m)",
-        data: [], // Will be populated dynamically
-        backgroundColor: [], // Will be populated dynamically based on water level
-        borderColor: [], // Will be populated dynamically based on water level
-        borderWidth: 1, // Border width
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Water Level (m)",
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: "Date",
-        },
-      },
-    },
-  },
-});
-
-// Function to update the chart with new data and colors
-function updateChart(labels, waterLevels) {
-  // Map water levels to their corresponding colors
-  const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level).backgroundColor);
-  const borderColors = waterLevels.map((level) => getColorForWaterLevel(level).borderColor);
-
-  // Update the chart data
-  waterLevelChart.data.labels = labels;
-  waterLevelChart.data.datasets[0].data = waterLevels;
-  waterLevelChart.data.datasets[0].backgroundColor = backgroundColors;
-  waterLevelChart.data.datasets[0].borderColor = borderColors;
-
-  // Update the chart
-  waterLevelChart.update();
-}
-
-// Fetch water level data from Supabase based on date range
-async function fetchWaterLevelData(startDate, endDate) {
-  try {
-    const { data, error } = await supabase
-      .from("water_levels") // Replace with your table name
-      .select("*")
-      .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
-      .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
-      .order("last_updated", { ascending: true }); // Order by timestamp
-
-    if (error) {
-      console.error("Error fetching data:", error);
-      return;
-    }
-
-    if (data && data.length > 0) {
-      const labels = data.map((entry) =>
-        new Date(entry.last_updated).toLocaleDateString()
-      );
-      const waterLevels = data.map((entry) => entry.water_level);
-
-      // Update the chart with new data and colors
-      updateChart(labels, waterLevels);
-    } else {
-      console.log("No data found for the selected date range.");
-    }
-  } catch (err) {
-    console.error("Error:", err);
-  }
-}
-
-// Fetch initial data (last 7 days by default)
-const endDate = new Date();
-const startDate = new Date();
-startDate.setDate(endDate.getDate() - 7); // Last 7 days
-fetchWaterLevelData(startDate, endDate);
-    
-      // Request notification permission
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            console.log("Notification permission granted.");
-          }
-        });
-      }
-    
-      // Show browser notification
-      function showNotification(title, message) {
-        if (Notification.permission === "granted") {
-          new Notification(title, {
-            body: message,
-            icon: "image/water-level-3-48.png", // Optional: Add an icon for the notification
-          });
-        }
-      }
-    
-      // Singleton pattern for Supabase Realtime channel
-      let waterLevelChannel;
-    
-      function subscribeToWaterLevelUpdates() {
-        if (waterLevelChannel) {
-          console.log("Channel already subscribed.");
-          return;
-        }
-    
-        waterLevelChannel = supabase
-          .channel("water-level-updates")
-          .on(
-            "postgres_changes",
+      // Chart.js initialization
+      const ctx = document.getElementById("waterLevelChart").getContext("2d");
+      const waterLevelChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: [], // Will be populated dynamically
+          datasets: [
             {
-              event: "INSERT", // Listen for new inserts
-              schema: "public",
-              table: "water_levels", // Replace with your table name
+              label: "Water Level (m)",
+              data: [], // Will be populated dynamically
+              backgroundColor: [], // Will be populated dynamically based on water level
+              borderColor: [], // Will be populated dynamically based on water level
+              borderWidth: 1, // Border width
             },
-            (payload) => {
-              const latestWaterLevel = payload.new.water_level; // Replace with your column name
-              console.log("New water level received:", latestWaterLevel);
-    
-              // Update the water level card
-              const waterLevelCard = document.getElementById("waterLevelDisplay");
-              if (waterLevelCard) {
-                waterLevelCard.textContent = latestWaterLevel.toFixed(1);
-                console.log("Water level card updated:", latestWaterLevel);
-              } else {
-                console.error("Water level card element not found!");
-              }
-    
-              // Check if water level is rising
-              if (lastWaterLevel !== null && latestWaterLevel > lastWaterLevel) {
-                // Early Warning: Trigger only if the water level is rising and below 15
-                if (latestWaterLevel < 3) {
-                  showNotification(
-                    "Early Warning: Water Level Rising",
-                    `Warning: Water level is rising. Current level: ${latestWaterLevel.toFixed(1)}m, Previous level: ${lastWaterLevel.toFixed(1)}m`
-                  );
-                }
-              }
-    
-              // Check if water level is 15 or above
-              if (latestWaterLevel >= 3) {
-                if (localStorage.getItem("warningNotificationShown") !== "true") {
-                  showNotification(
-                    "Water Level Alert",
-                    `Warning: Water level is critically high at ${latestWaterLevel.toFixed(1)}m!`
-                  );
-                  localStorage.setItem("warningNotificationShown", "true"); // Set the flag in localStorage
-                }
-                // Update the alerts count
-                fetchHighWaterLevelCount();
-              } else {
-                // Reset the flag if the water level drops below 15
-                localStorage.setItem("warningNotificationShown", "false");
-              }
-    
-              // Update the last water level
-              lastWaterLevel = latestWaterLevel;
-    
-              // Update the chart with the new data point
-              const currentDate = new Date().toLocaleDateString();
-              waterLevelChart.data.labels.push(currentDate);
-              waterLevelChart.data.datasets[0].data.push(latestWaterLevel);
-              waterLevelChart.update();
-    
-              // Update the warning message
-              updateWarningMessage(latestWaterLevel);
-            }
-          )
-          .subscribe((status) => {
-            console.log("Supabase Realtime channel status:", status);
-          });
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "Water Level (m)",
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: "Date",
+              },
+            },
+          },
+        },
+      });
+
+      // Function to update the chart with new data and colors
+      function updateChart(labels, waterLevels) {
+        // Map water levels to their corresponding colors
+        const backgroundColors = waterLevels.map((level) => getColorForWaterLevel(level).backgroundColor);
+        const borderColors = waterLevels.map((level) => getColorForWaterLevel(level).borderColor);
+
+        // Update the chart data
+        waterLevelChart.data.labels = labels;
+        waterLevelChart.data.datasets[0].data = waterLevels;
+        waterLevelChart.data.datasets[0].backgroundColor = backgroundColors;
+        waterLevelChart.data.datasets[0].borderColor = borderColors;
+
+        // Update the chart
+        waterLevelChart.update();
       }
-    
-      // Fetch the latest water level when the page loads
-      async function fetchLatestWaterLevel() {
+
+      // Fetch water level data from Supabase based on date range
+      async function fetchWaterLevelData(startDate, endDate) {
         try {
           const { data, error } = await supabase
-            .from("water_levels")
-            .select("water_level")
-            .order("last_updated", { ascending: false })
-            .limit(1);
-    
+            .from("water_levels") // Replace with your table name
+            .select("*")
+            .gte("last_updated", startDate.toISOString()) // Greater than or equal to start date
+            .lte("last_updated", endDate.toISOString()) // Less than or equal to end date
+            .order("last_updated", { ascending: true }); // Order by timestamp
+
           if (error) {
-            console.error("Error fetching latest water level:", error);
+            console.error("Error fetching data:", error);
             return;
           }
-    
+
           if (data && data.length > 0) {
-            const latestWaterLevel = data[0].water_level;
-            const waterLevelCard = document.getElementById("waterLevelDisplay");
-            if (waterLevelCard) {
-              waterLevelCard.textContent = latestWaterLevel.toFixed(1);
-              console.log("Initial water level card updated:", latestWaterLevel);
-    
-              // Update the warning message based on the fetched water level
-              updateWarningMessage(latestWaterLevel);
-            }
-            // Set the last water level
-            lastWaterLevel = latestWaterLevel;
-          }
-        } catch (err) {
-          console.error("Error:", err);
-        }
-      }
-    
-      function updateWarningMessage(waterLevel) {
-        const warningElement = document.getElementById("waterLevelWarning");
-        if (warningElement) {
-          // Remove existing classes
-          warningElement.classList.remove("critical", "high", "moderate");
-    
-          if (waterLevel >= 3) {
-            warningElement.textContent = "Status: Critical";
-            warningElement.classList.add("critical");
-          } else if (waterLevel >= 2 && waterLevel < 3) {
-            warningElement.textContent = "Status: High";
-            warningElement.classList.add("high");
-          } else if (waterLevel < 2) {
-            warningElement.textContent = "Status: Moderate";
-            warningElement.classList.add("moderate");
-          }
-          console.log("Warning text updated:", warningElement.textContent);
-        } else {
-          console.error("Warning element not found!");
-        }
-      }
-    
-      async function fetchHighWaterLevelCount() {
-        try {
-          const { count, error } = await supabase
-            .from("water_levels")
-            .select("*", { count: "exact", head: true })
-            .gte("water_level", 3);
-    
-          if (error) {
-            console.error("Error fetching high water level count:", error);
-            return;
-          }
-    
-          const alertsCard = document.querySelector(".small-box.bg-danger .inner h3");
-          if (alertsCard) {
-            alertsCard.textContent = count;
-            console.log("Alerts card updated:", count);
+            const labels = data.map((entry) =>
+              new Date(entry.last_updated).toLocaleDateString()
+            );
+            const waterLevels = data.map((entry) => entry.water_level);
+
+            // Update the chart with new data and colors
+            updateChart(labels, waterLevels);
           } else {
-            console.error("Alerts card element not found!");
+            console.log("No data found for the selected date range.");
           }
         } catch (err) {
           console.error("Error:", err);
         }
       }
-    
-      // Subscribe to water level updates
-      subscribeToWaterLevelUpdates();
-    
-      // Cleanup on page unload
-      window.addEventListener("beforeunload", () => {
-        if (waterLevelChannel) {
-          supabase.removeChannel(waterLevelChannel);
-          console.log("Unsubscribed from Supabase Realtime channel.");
-        }
-      });
-    
-      fetchLatestWaterLevel();
-      fetchHighWaterLevelCount();
-    
-      async function fetchWaterLevelCount() {
-        try {
-          const { data, error } = await supabase.from("water_levels").select("*", { count: "exact" });
-    
-          if (error) {
-            console.error("Error fetching water level count:", error.message);
-            return;
-          }
-    
-          // Update the count in the History Records card
-          const waterLevelCount = data.length;
-          document.querySelector(".col-lg-3.col-6 .bg-success h3").textContent = waterLevelCount || 0;
-        } catch (err) {
-          console.error("Unexpected error:", err);
-        }
-      }
-    
-      setInterval(fetchWaterLevelCount, 2000); // Fetch every 10 seconds 
+
+      // Fetch initial data (last 7 days by default)
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7); // Last 7 days
+      fetchWaterLevelData(startDate, endDate);
     </script>
 
     <script>
