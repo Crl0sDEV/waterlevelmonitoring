@@ -71,6 +71,7 @@
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
+            <span class="nav-text" id="navbar-date">--/--/----</span>
             <span class="nav-text" id="navbar-clock">--:--</span>
           </li>
         </ul>
@@ -262,20 +263,29 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
+      // Update the navbar clock and date every second
       function updateNavbarClock() {
         const options = {
           timeZone: "Asia/Manila",
           hour: "2-digit",
           minute: "2-digit",
-          hour12: true
+          hour12: true,
         };
         const time = new Date().toLocaleTimeString("en-US", options);
+        const date = new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+
         document.getElementById("navbar-clock").textContent = time;
+        document.getElementById("navbar-date").textContent = date;
       }
 
       setInterval(updateNavbarClock, 1000);
-      updateNavbarClock();
+      updateNavbarClock(); // Initial call
     </script>
+
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const toggleButton = document.querySelector('[data-widget="pushmenu"]');
