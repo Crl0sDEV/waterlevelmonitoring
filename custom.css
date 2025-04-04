@@ -7,40 +7,40 @@
 
 
 .color-legend-container {
-    max-width: 800px; /* Adjust the size of the legend box */
-    margin: 20px auto; /* Center the container */
-    text-align: center; /* Align text in the center */
-    background-color: #f8f9fa; /* Light gray background for the legend container */
-    padding: 15px; /* Space inside the box */
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+    background-color: #f8f9fa;
+    padding: 15px;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .color-legend-title {
     font-weight: bold;
-    font-size: 14px; /* Smaller title text */
-    margin-bottom: 10px; /* Space between title and legend items */
+    font-size: 14px;
+    margin-bottom: 10px;
     text-align: left;
 }
 
 .color-legend {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Two columns */
-    gap: 10px; /* Space between items */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
 .color-legend-item {
     font-size: 10px;
     display: flex;
     align-items: center;
-    padding: 5px; /* Reduce padding for smaller size */
+    padding: 5px;
     border-radius: 5px;
-    background-color: white; /* Background for individual items */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Shadow for each item */
+    background-color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .color-box {
-    width: 15px; /* Smaller size */
+    width: 15px;
     height: 15px;
     margin-right: 10px;
     border-radius: 3px;
@@ -58,7 +58,7 @@
     background-color: gold;
 }
 
-/* Add this CSS for the navbar */
+
 .navbar-nav .nav-item {
     display: flex;
     align-items: center;
@@ -72,35 +72,35 @@
     margin-left: 10px;
 }
 
-/* Override the background colors for all cards */
+
 .small-box.bg-info, 
 .small-box.bg-danger, 
 .small-box.bg-success, 
 .small-box.bg-secondary {
   background-color: white !important;
-  color: #007aff !important; /* Lighter text color */
+  color: #007aff !important;
 }
 
-/* Adjust the footer link color if needed */
+
 .small-box-footer {
-  color: #373a43 !important; /* Lighter footer text color */
+  color: #373a43 !important;
 }
 
 .small-box-footer:hover {
-  color: #333333 !important; /* Slightly darker on hover */
+  color: #333333 !important;
 }
 
-/* Add this CSS to remove the underline effect */
+
 .brand-link {
-    text-decoration: none !important; /* Remove underline */
-    cursor: default; /* Prevent pointer cursor */
-    pointer-events: none; /* Disable click events */
+    text-decoration: none !important;
+    cursor: default;
+    pointer-events: none;
   }
   
   .brand-link:hover {
-    text-decoration: none !important; /* Remove underline on hover */
+    text-decoration: none !important;
   }
   
   .brand-text {
-    text-decoration: none !important; /* Ensure no underline is applied to the text */
+    text-decoration: none !important;
   }
